@@ -54,6 +54,7 @@
                 android:layout_marginLeft="15dp">
 
                 <com.sundroid.lystn.view.RobotoBoldTV
+                    android:id="@+id/tv_user_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Login/Register"
@@ -64,7 +65,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="Manage your subscription after login"/>
+                    android:text="Manage update information"/>
 
             </LinearLayout>
 
@@ -219,6 +220,38 @@
                 android:src="@drawable/ic_more"/>
 
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_logout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="15dp"
+                android:adjustViewBounds="true"
+                android:layout_marginLeft="15dp"
+                android:src="@drawable/ic_logout"/>
+
+            <com.sundroid.lystn.view.RobotoRegularTV
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginRight="15dp"
+                android:layout_marginLeft="15dp"
+                android:text="Logout"
+                android:textColor="#000000"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="15dp"
+                android:src="@drawable/ic_more"/>
+
+        </LinearLayout>
+
 
         <ImageView
             android:id="@+id/iv_subscription"

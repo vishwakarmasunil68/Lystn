@@ -48,6 +48,17 @@ public class LanguageSelectAdapter extends RecyclerView.Adapter<LanguageSelectAd
             holder.iv_right_tick.setVisibility(View.GONE);
         }
 
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for(int i=0;i<items.size();i++){
+                    items.get(i).setSelected(false);
+                }
+                items.get(position).setSelected(true);
+                notifyDataSetChanged();
+            }
+        });
+
 
         holder.itemView.setTag(items.get(position));
     }

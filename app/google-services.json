@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "25294674825",
+    "firebase_url": "https://lystn-1577982084153.firebaseio.com",
+    "project_id": "lystn-1577982084153",
+    "storage_bucket": "lystn-1577982084153.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:25294674825:android:d362747128bd098bb29f58",
+        "android_client_info": {
+          "package_name": "com.sundroid.lystn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "25294674825-blffij4ca5shf22r91hb9qjcih157po6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sundroid.lystn",
+            "certificate_hash": "5e15b456a1ba6ea036092c15a138089b2a9eafe5"
+          }
+        },
+        {
+          "client_id": "25294674825-p8p609hqjmk2eavk8c02c00a8330vr2c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTbXNtGvWNetI3VIZ-1MKgQGF5HT93Ceo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "25294674825-p8p609hqjmk2eavk8c02c00a8330vr2c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

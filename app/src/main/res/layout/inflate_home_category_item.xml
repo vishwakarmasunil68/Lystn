@@ -12,15 +12,17 @@
         android:orientation="horizontal"
         android:layout_gravity="center_vertical"
         android:gravity="center_vertical"
-        android:background="@drawable/ll_home_pink_category">
+        android:background="@drawable/ll_home_category_1">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv_item"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_marginLeft="5dp"
             android:src="@drawable/ll_disc"/>
 
         <com.sundroid.lystn.view.RobotoRegularTV
+            android:id="@+id/tv_cat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"

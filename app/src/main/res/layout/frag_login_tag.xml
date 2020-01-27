@@ -66,410 +66,416 @@
             android:layout_gravity="center"
             android:orientation="vertical">
 
-            <LinearLayout
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:orientation="vertical">-->
+
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:paddingLeft="20dp"-->
+<!--                    android:paddingRight="20dp"-->
+<!--                    android:paddingTop="15dp">-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="Hot"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_marginLeft="7dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="Education"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_marginLeft="7dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="Dream"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_marginLeft="7dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="K12"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                </LinearLayout>-->
+
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:paddingLeft="20dp"-->
+<!--                    android:paddingRight="20dp"-->
+<!--                    android:paddingTop="15dp">-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="Marketing"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:layout_marginLeft="7dp"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="BusinessWeek"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_marginLeft="7dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="Books"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+
+<!--                </LinearLayout>-->
+
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:paddingLeft="20dp"-->
+<!--                    android:paddingRight="20dp"-->
+<!--                    android:paddingTop="15dp">-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="Food"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_marginLeft="7dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="Vlog"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_marginLeft="7dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="Faction"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:layout_marginLeft="7dp"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="Design"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                </LinearLayout>-->
+
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:paddingLeft="20dp"-->
+<!--                    android:paddingRight="20dp"-->
+<!--                    android:paddingTop="15dp">-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="Art"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:layout_marginLeft="7dp"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="Shopping &amp; E-comm"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_marginLeft="7dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="Stand-up"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                </LinearLayout>-->
+
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:paddingLeft="20dp"-->
+<!--                    android:paddingRight="20dp"-->
+<!--                    android:paddingTop="15dp">-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="Education Technology"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_marginLeft="7dp"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="Computer"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+
+<!--                </LinearLayout>-->
+
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:paddingLeft="20dp"-->
+<!--                    android:paddingRight="20dp"-->
+<!--                    android:paddingTop="15dp">-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="SimpleDesign"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_marginLeft="7dp"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="SimpleDesign"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_marginLeft="7dp"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="School"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                </LinearLayout>-->
+
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:paddingLeft="20dp"-->
+<!--                    android:paddingRight="20dp"-->
+<!--                    android:paddingTop="15dp">-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="National"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_marginLeft="7dp"-->
+<!--                        android:background="@drawable/ll_type_back"-->
+<!--                        android:gravity="center"-->
+<!--                        android:paddingLeft="14dp"-->
+<!--                        android:paddingTop="7dp"-->
+<!--                        android:paddingRight="14dp"-->
+<!--                        android:paddingBottom="7dp"-->
+<!--                        android:text="World"-->
+<!--                        android:textColor="#000000"-->
+<!--                        />-->
+
+<!--                </LinearLayout>-->
+
+<!--            </LinearLayout>-->
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_genre_category"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingLeft="20dp"
-                    android:paddingRight="20dp"
-                    android:paddingTop="15dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_gravity="center"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="Hot"
-                        android:textColor="#000000"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="7dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="Education"
-                        android:textColor="#000000"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="7dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="Dream"
-                        android:textColor="#000000"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="7dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="K12"
-                        android:textColor="#000000"
-                        />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingLeft="20dp"
-                    android:paddingRight="20dp"
-                    android:paddingTop="15dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:layout_weight="1"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="Marketing"
-                        android:textColor="#000000"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="7dp"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="BusinessWeek"
-                        android:textColor="#000000"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="7dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="Books"
-                        android:textColor="#000000"
-                        />
-
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingLeft="20dp"
-                    android:paddingRight="20dp"
-                    android:paddingTop="15dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="Food"
-                        android:textColor="#000000"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="7dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="Vlog"
-                        android:textColor="#000000"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="7dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="Faction"
-                        android:textColor="#000000"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="7dp"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="Design"
-                        android:textColor="#000000"
-                        />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingLeft="20dp"
-                    android:paddingRight="20dp"
-                    android:paddingTop="15dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="Art"
-                        android:textColor="#000000"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="7dp"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="Shopping &amp; E-comm"
-                        android:textColor="#000000"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="7dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="Stand-up"
-                        android:textColor="#000000"
-                        />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingLeft="20dp"
-                    android:paddingRight="20dp"
-                    android:paddingTop="15dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="Education Technology"
-                        android:textColor="#000000"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="7dp"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="Computer"
-                        android:textColor="#000000"
-                        />
-
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingLeft="20dp"
-                    android:paddingRight="20dp"
-                    android:paddingTop="15dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="SimpleDesign"
-                        android:textColor="#000000"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="7dp"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:layout_weight="1"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="SimpleDesign"
-                        android:textColor="#000000"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="7dp"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:layout_weight="1"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="School"
-                        android:textColor="#000000"
-                        />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingLeft="20dp"
-                    android:paddingRight="20dp"
-                    android:paddingTop="15dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="National"
-                        android:textColor="#000000"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="7dp"
-                        android:background="@drawable/ll_type_back"
-                        android:gravity="center"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="7dp"
-                        android:text="World"
-                        android:textColor="#000000"
-                        />
-
-                </LinearLayout>
-
-            </LinearLayout>
+                android:layout_weight="1"></androidx.recyclerview.widget.RecyclerView>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -478,6 +484,12 @@
                 android:layout_gravity="center"
                 android:padding="15dp"
                 android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tv_tags"
+                    android:layout_width="wrap_content"
+                    android:visibility="gone"
+                    android:layout_height="wrap_content"/>
 
                 <ImageView
                     android:id="@+id/iv_login_mobile"

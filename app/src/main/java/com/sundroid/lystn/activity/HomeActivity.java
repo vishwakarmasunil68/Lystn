@@ -1,9 +1,17 @@
 package com.sundroid.lystn.activity;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -11,24 +19,47 @@ import android.widget.TextView;
 
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.gson.Gson;
 import com.sundroid.lystn.R;
 import com.sundroid.lystn.adapter.ViewPagerAdapter;
 import com.sundroid.lystn.fragment.download.DownloadListFragment;
 import com.sundroid.lystn.fragment.home.AllArtistFragment;
 import com.sundroid.lystn.fragment.home.AllGenreFragment;
 import com.sundroid.lystn.fragment.home.AllRadioFragment;
+import com.sundroid.lystn.fragment.home.ArtisteDetailFragment;
+import com.sundroid.lystn.fragment.home.CategoryTagFragment;
+import com.sundroid.lystn.fragment.home.GenreDetailFragment;
+import com.sundroid.lystn.fragment.home.HomeAllContentFragment;
 import com.sundroid.lystn.fragment.home.HomeFragment;
 import com.sundroid.lystn.fragment.home.LibraryFragment;
 import com.sundroid.lystn.fragment.home.ManageSubscriptionFragment;
 import com.sundroid.lystn.fragment.home.MeFragment;
 import com.sundroid.lystn.fragment.home.MeSubscriptionFragment;
+import com.sundroid.lystn.fragment.home.MusicPlayerFragment;
 import com.sundroid.lystn.fragment.home.SearchFragment;
 import com.sundroid.lystn.fragment.home.UpdateFragment;
 import com.sundroid.lystn.fragment.login.LoginSelectLanguageFragment;
 import com.sundroid.lystn.fragment.playlist.PlayListFragment;
 import com.sundroid.lystn.fragmentcontroller.ActivityManager;
+import com.sundroid.lystn.pojo.artiste.ArtisteDetailPOJO;
+import com.sundroid.lystn.pojo.home.HomeContentPOJO;
+import com.sundroid.lystn.pojo.home.HomePOJO;
+import com.sundroid.lystn.service.Constants;
+import com.sundroid.lystn.service.MediaService;
+import com.sundroid.lystn.util.Pref;
+import com.sundroid.lystn.util.StringUtils;
+import com.sundroid.lystn.util.TagUtils;
+import com.sundroid.lystn.util.ToastClass;
+import com.sundroid.lystn.webservice.ApiCallBase;
+import com.sundroid.lystn.webservice.WebServicesCallBack;
+import com.sundroid.lystn.webservice.WebServicesUrls;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -81,14 +112,30 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
     List<ImageView> imageViews = new ArrayList<>();
     List<TextView> textViews = new ArrayList<>();
 
+    //    HomeContentPOJO homeContentPOJO;
+    HomeFragment homeFragment;
+    List<HomeContentPOJO> homeContentPOJOS = new ArrayList<>();
+    int playingPosition = -1;
+
+    List<String> artisteFollowUpList = new ArrayList<>();
+    List<String> genreFollowUpList = new ArrayList<>();
+
+    String media_type = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            View decor = getWindow().getDecorView();
-            decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
+
+
+//        if (Build.VERSION.SDK_INT >= 19 && Build.VERSION.SDK_INT < 21) {
+//            setWindowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, true);
+//        }
+//        if (Build.VERSION.SDK_INT >= 19) {
+//            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+//        }
+        //make fully Android Transparent Status bar
+
+        maketranslucentStatusBar();
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
 
@@ -119,12 +166,36 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         ll_library.setOnClickListener(this);
         ll_me.setOnClickListener(this);
 
+
+        checkUserProfileLoaded();
+
     }
+
+    public void checkUserProfileLoaded() {
+
+        artisteFollowUpList.clear();
+        genreFollowUpList.clear();
+
+        if (!Pref.GetBooleanPref(getApplicationContext(), StringUtils.IS_USER_PROFILE_LOADED, false)) {
+            getUserProfile();
+        } else {
+            String artisteFollowString = Pref.GetStringPref(getApplicationContext(), StringUtils.ARTISTE_FOLLOW_UP_STRING, "");
+            if (artisteFollowString.length() > 0) {
+                artisteFollowUpList.addAll(Arrays.asList(artisteFollowString.split(",")));
+            }
+
+            String genreFollowString = Pref.GetStringPref(getApplicationContext(), StringUtils.GENRE_FOLLOW_UP_STRING, "");
+            if (genreFollowString.length() > 0) {
+                genreFollowUpList.addAll(Arrays.asList(genreFollowString.split(",")));
+            }
+        }
+    }
+
 
     private void setupViewPager(ViewPager viewPager) {
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFrag(new HomeFragment(), "Monitor");
+        adapter.addFrag(homeFragment = new HomeFragment(), "Monitor");
         adapter.addFrag(new SearchFragment(), "Monitor");
         adapter.addFrag(new UpdateFragment(), "Monitor");
         adapter.addFrag(new LibraryFragment(), "Monitor");
@@ -177,6 +248,10 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         }
     }
 
+    public void setViewPagerIndex(int position) {
+        viewPager.setCurrentItem(position);
+    }
+
     public void makeAllUnselected() {
         iv_home.setImageResource(R.drawable.ic_home_nonselected);
         iv_search.setImageResource(R.drawable.ic_search_nonselected);
@@ -211,6 +286,18 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getApplicationContext().registerReceiver(mMessageReceiver, new IntentFilter(StringUtils.UPDATE_HOME_ACTIVITY));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        getApplicationContext().unregisterReceiver(mMessageReceiver);
+    }
+
     public void startAllArtistFragment() {
         startFragment(R.id.frame_main, new AllArtistFragment());
     }
@@ -225,26 +312,424 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
 
 
     public void showUnLockPremiumFragment() {
-        startFragment(R.id.frame_main,new MeSubscriptionFragment());
+        startFragment(R.id.frame_main, new MeSubscriptionFragment());
     }
 
     public void startManageSubscription() {
-        startFragment(R.id.frame_main,new ManageSubscriptionFragment());
+        startFragment(R.id.frame_main, new ManageSubscriptionFragment());
     }
 
     public void startSelectLangageFragment() {
-        startFragment(R.id.frame_main,new LoginSelectLanguageFragment());
+        startFragment(R.id.frame_main, new LoginSelectLanguageFragment());
     }
 
     public void startMusicPlayerFragment() {
-
+        if (homeContentPOJOS != null && homeContentPOJOS.size() > 0 && playingPosition != -1) {
+            makeTransparentStatusBar();
+            startFragment(R.id.frame_main, new MusicPlayerFragment(homeContentPOJOS.get(playingPosition)));
+        }
     }
 
     public void showDownloadFragment() {
-        startFragment(R.id.frame_main,new DownloadListFragment());
+        startFragment(R.id.frame_main, new DownloadListFragment());
     }
 
     public void showPlayListFragment() {
-        startFragment(R.id.frame_main,new PlayListFragment());
+        startFragment(R.id.frame_main, new PlayListFragment());
     }
+
+    public void showCategoryListFragment(String bk_id) {
+        startFragment(R.id.frame_main, new CategoryTagFragment(bk_id));
+    }
+
+    public void showHomeAllContentFragment(HomePOJO homePOJO) {
+        startFragment(R.id.frame_main, new HomeAllContentFragment(homePOJO));
+    }
+
+
+    public void nextSong() {
+        if (homeContentPOJOS != null && homeContentPOJOS.size() > 0 && playingPosition != -1) {
+            if ((homeContentPOJOS.size() - 1) > playingPosition) {
+                playingPosition = playingPosition + 1;
+                MusicPlayerFragment musicPlayerFragment = getMusicPlayerFragment();
+                if (musicPlayerFragment != null) {
+                    musicPlayerFragment.setHomeContentPOJO(homeContentPOJOS.get(playingPosition));
+                    startPlayer(homeContentPOJOS.get(playingPosition));
+                }
+            }
+        }
+    }
+
+
+    public void previousSong() {
+        Log.d(TagUtils.getTag(), "previous song");
+        if (homeContentPOJOS != null && homeContentPOJOS.size() > 0 && playingPosition != -1) {
+            if (playingPosition != 0) {
+                playingPosition = playingPosition - 1;
+                MusicPlayerFragment musicPlayerFragment = getMusicPlayerFragment();
+                if (musicPlayerFragment != null) {
+                    musicPlayerFragment.setHomeContentPOJO(homeContentPOJOS.get(playingPosition));
+                    startPlayer(homeContentPOJOS.get(playingPosition));
+                }
+            }
+        }
+    }
+
+    public void playAudio(List<HomeContentPOJO> homeContentPOJOS, int position, String type) {
+        Pref.SetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, type);
+        this.media_type = type;
+        this.homeContentPOJOS.clear();
+        this.homeContentPOJOS.addAll(homeContentPOJOS);
+        this.playingPosition = position;
+        startMusicPlayerFragment();
+        startPlayer(this.homeContentPOJOS.get(playingPosition));
+    }
+
+    public void startPlayer(HomeContentPOJO homeContentPOJO) {
+        showProgressBar();
+        if (!isMyServiceRunning(MediaService.class)) {
+            Intent serviceIntent = new Intent(HomeActivity.this, MediaService.class);
+            serviceIntent.setAction(Constants.ACTION.STARTFOREGROUND_ACTION);
+            serviceIntent.putExtra(StringUtils.AUDIO_DATA, new Gson().toJson(homeContentPOJO));
+            serviceIntent.putExtra(StringUtils.MEDIA_TYPE, media_type);
+            startService(serviceIntent);
+        } else {
+            playSongMessageToService(homeContentPOJO);
+        }
+    }
+
+    public void setMusicPlayerFragmentPlayImage(boolean is_playing) {
+
+        if (fragmentList != null && fragmentList.size() > 0) {
+            for (int i = 0; i < fragmentList.size(); i++) {
+                Log.d(TagUtils.getTag(), "fragment:-" + fragmentList.get(i).getClass().getName());
+                if (fragmentList.get(i) instanceof MusicPlayerFragment) {
+                    MusicPlayerFragment musicPlayerFragment = (MusicPlayerFragment) fragmentList.get(i);
+
+                }
+            }
+        }
+
+        MusicPlayerFragment musicPlayerFragment = getMusicPlayerFragment();
+        if (musicPlayerFragment != null) {
+            musicPlayerFragment.setPlayImage(is_playing);
+        }
+        homeFragment.setHomeContentPOJO(homeContentPOJOS.get(playingPosition));
+        homeFragment.playPauseMusic(is_playing);
+    }
+
+    public void playSongMessageToService(HomeContentPOJO homeContentPOJO) {
+        try {
+            Intent intent = new Intent(StringUtils.UPDATE_SERVICE);
+            intent.putExtra("type", StringUtils.PLAY_SONG);
+            intent.putExtra(StringUtils.AUDIO_DATA, homeContentPOJO);
+            intent.putExtra(StringUtils.MEDIA_TYPE, media_type);
+            sendBroadcast(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        android.app.ActivityManager manager = (android.app.ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (android.app.ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                String type = intent.getStringExtra("type");
+                Log.d(TagUtils.getTag(), "type:-" + type);
+                if (type.equalsIgnoreCase("dismiss_progress")) {
+                    dismissProgressBar();
+                } else if (type.equalsIgnoreCase(StringUtils.MUSIC_PLAYING_STATUS)) {
+                    Log.d(TagUtils.getTag(), "setting music Player status");
+                    setMusicPlayerFragmentPlayImage(intent.getBooleanExtra("status", false));
+                } else if (type.equalsIgnoreCase(StringUtils.NEXT_SONG)) {
+                    nextSong();
+                } else if (type.equalsIgnoreCase(StringUtils.PREVIOUS_SONG)) {
+                    previousSong();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    public void playPausePlayer() {
+        try {
+            Intent intent = new Intent(StringUtils.UPDATE_SERVICE);
+            intent.putExtra("type", StringUtils.PLAY_PAUSE_MEDIA);
+            sendBroadcast(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void checkPlayerRunning() {
+        try {
+            Intent intent = new Intent(StringUtils.UPDATE_SERVICE);
+            intent.putExtra("type", StringUtils.CHECK_PLAYER);
+            sendBroadcast(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public MusicPlayerFragment getMusicPlayerFragment() {
+        if (fragmentList != null && fragmentList.size() > 0) {
+            for (int i = 0; i < fragmentList.size(); i++) {
+                if (fragmentList.get(i) instanceof MusicPlayerFragment) {
+                    MusicPlayerFragment musicPlayerFragment = (MusicPlayerFragment) fragmentList.get(i);
+                    return musicPlayerFragment;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void onMusicPlayerClosed() {
+        Log.d(TagUtils.getTag(), "Music Player closed");
+        maketranslucentStatusBar();
+    }
+
+    public void makeTransparentStatusBar() {
+        if (Build.VERSION.SDK_INT >= 19 && Build.VERSION.SDK_INT < 21) {
+            setWindowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, true);
+        }
+        if (Build.VERSION.SDK_INT >= 19) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
+        //make fully Android Transparent Status bar
+        if (Build.VERSION.SDK_INT >= 21) {
+            setWindowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
+    }
+
+    public void maketranslucentStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            View decor = getWindow().getDecorView();
+            decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
+    }
+
+    public static void setWindowFlag(Activity activity, final int bits, boolean on) {
+        Window win = activity.getWindow();
+        WindowManager.LayoutParams winParams = win.getAttributes();
+        if (on) {
+            winParams.flags |= bits;
+        } else {
+            winParams.flags &= ~bits;
+        }
+        win.setAttributes(winParams);
+    }
+
+    public void showArtisteDetail(String conId) {
+        JSONObject jsonObject = new JSONObject();
+
+        showProgressBar();
+
+        try {
+            jsonObject.put("userId", Pref.GetStringPref(getApplicationContext(), StringUtils.USER_ID, ""));
+            jsonObject.put("deviceId", Pref.GetStringPref(getApplicationContext(), StringUtils.DEVICE_ID, ""));
+//            jsonObject.put("conId", "5268");
+            jsonObject.put("conId", conId);
+            jsonObject.put("langCode", "en");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        new ApiCallBase(this, new WebServicesCallBack() {
+            @Override
+            public void onGetMsg(String apicall, String response) {
+                dismissProgressBar();
+                homeContentPOJOS.clear();
+                try {
+                    String object = new String(response);
+                    JSONObject jsonObject = new JSONObject(object);
+                    JSONObject responseObject = jsonObject.optJSONObject("response");
+                    if (responseObject.optBoolean("status")) {
+
+                        JSONObject content = responseObject.optJSONObject("data").optJSONArray("contents").optJSONObject(0);
+                        ArtisteDetailPOJO artisteDetailPOJO = new Gson().fromJson(content.toString(), ArtisteDetailPOJO.class);
+                        startPodcastFragment(artisteDetailPOJO.getPodcastId());
+
+                    } else {
+                        ToastClass.showShortToast(getApplicationContext(), "Something went wrong");
+                    }
+                    Log.d(TagUtils.getTag(), jsonObject.toString());
+                } catch (JSONException e) {
+                    ToastClass.showShortToast(getApplicationContext(), "No Data Found");
+                    ;
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onErrorMsg(String status_code, String response) {
+                dismissProgressBar();
+            }
+        }, "GET_HOME_CONTENT").makeApiCall(WebServicesUrls.GET_ARTIST_BUCKET, jsonObject);
+    }
+
+    public void startPodcastFragment(String conId) {
+        startFragment(R.id.frame_main, new ArtisteDetailFragment(conId));
+    }
+
+    public void startGenreDetailFragment(String conId) {
+        startFragment(R.id.frame_main, new GenreDetailFragment(conId));
+    }
+
+
+    public void getUserProfile() {
+        JSONObject jsonObject = new JSONObject();
+
+        showProgressBar();
+
+        try {
+            jsonObject.put("userId", Pref.GetStringPref(getApplicationContext(), StringUtils.USER_ID, ""));
+            jsonObject.put("deviceId", Pref.GetStringPref(getApplicationContext(), StringUtils.DEVICE_ID, ""));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        new ApiCallBase(this, new WebServicesCallBack() {
+            @Override
+            public void onGetMsg(String apicall, String response) {
+                dismissProgressBar();
+                homeContentPOJOS.clear();
+                try {
+                    String object = new String(response);
+                    JSONObject jsonObject = new JSONObject(object);
+                    JSONObject responseObject = jsonObject.optJSONObject("response");
+                    if (responseObject.optBoolean("status")) {
+                        JSONObject followJSONObject = responseObject.optJSONObject("followList");
+                        JSONArray artisteFollows = followJSONObject.optJSONArray("artisteFollows");
+                        String followString = "";
+                        for (int i = 0; i < artisteFollows.length(); i++) {
+                            if ((i + 1) == artisteFollows.length()) {
+                                followString += artisteFollows.optString(i);
+                            } else {
+                                followString += artisteFollows.optString(i) + ",";
+                            }
+                        }
+                        Pref.SetStringPref(getApplicationContext(), StringUtils.ARTISTE_FOLLOW_UP_STRING, followString);
+
+                        if (followString.length() > 0) {
+                            artisteFollowUpList.addAll(Arrays.asList(followString.split(",")));
+                        }
+
+
+                        JSONArray genreFollows = followJSONObject.optJSONArray("genreFollows");
+                        String genreString = "";
+                        for (int i = 0; i < genreFollows.length(); i++) {
+                            if ((i + 1) == genreFollows.length()) {
+                                genreString += genreFollows.optString(i);
+                            } else {
+                                genreString += genreFollows.optString(i) + ",";
+                            }
+                        }
+                        Pref.SetStringPref(getApplicationContext(), StringUtils.GENRE_FOLLOW_UP_STRING, genreString);
+
+                        if (genreString.length() > 0) {
+                            genreFollowUpList.addAll(Arrays.asList(genreString.split(",")));
+                        }
+
+                        Pref.SetBooleanPref(getApplicationContext(), StringUtils.IS_USER_PROFILE_LOADED, true);
+
+                    } else {
+                        ToastClass.showShortToast(getApplicationContext(), "Something went wrong");
+                    }
+                    Log.d(TagUtils.getTag(), jsonObject.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onErrorMsg(String status_code, String response) {
+                dismissProgressBar();
+            }
+        }, "GET_PROFILE").makeApiCall(WebServicesUrls.GET_PROFILE, jsonObject);
+    }
+
+    public List<String> getArtisteFollowUpList() {
+        return artisteFollowUpList;
+    }
+
+    public List<String> getGenreFollowUpList() {
+        return genreFollowUpList;
+    }
+
+    public void addFollowUpData(String prefString, String followId) {
+        String followUp = Pref.GetStringPref(getApplicationContext(), prefString, "");
+        List<String> followList = new ArrayList<>();
+        if (followUp.length() > 0) {
+            followList.addAll(Arrays.asList(followUp.split(",")));
+            followList.add(followId);
+        } else {
+            followList.add(followId);
+        }
+        String followString = "";
+        for (int i = 0; i < followList.size(); i++) {
+            if ((i + 1) == followList.size()) {
+                followString += followList.get(i);
+            } else {
+                followString += followList.get(i) + ",";
+            }
+        }
+        Pref.SetStringPref(getApplicationContext(), prefString, followString);
+        if (prefString.equalsIgnoreCase(StringUtils.ARTISTE_FOLLOW_UP_STRING)) {
+            artisteFollowUpList.add(followId);
+        } else if (prefString.equalsIgnoreCase(StringUtils.GENRE_FOLLOW_UP_STRING)) {
+            genreFollowUpList.add(followId);
+        }
+    }
+
+    public void removeFollowUP(String prefString, String followId) {
+        String followUp = Pref.GetStringPref(getApplicationContext(), prefString, "");
+        List<String> followList = new ArrayList<>();
+        if (followUp.length() > 0) {
+            followList.addAll(Arrays.asList(followUp.split(",")));
+            if (followList.contains(followId)) {
+                followList.remove(followId);
+            }
+        }
+        String followString = "";
+        for (int i = 0; i < followList.size(); i++) {
+            if ((i + 1) == followList.size()) {
+                followString += followList.get(i);
+            } else {
+                followString += followList.get(i) + ",";
+            }
+        }
+        Pref.SetStringPref(getApplicationContext(), prefString, followString);
+        if (prefString.equalsIgnoreCase(StringUtils.ARTISTE_FOLLOW_UP_STRING)) {
+            if (artisteFollowUpList.contains(followId)) {
+                artisteFollowUpList.remove(followId);
+            }
+        } else if (prefString.equalsIgnoreCase(StringUtils.GENRE_FOLLOW_UP_STRING)) {
+            if (genreFollowUpList.contains(followId)) {
+                genreFollowUpList.remove(followId);
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(HomeActivity.this, MediaService.class));
+    }
+
+    public void playEpisode(List<HomeContentPOJO> homeContentPOJOS,int index) {
+        playAudio(homeContentPOJOS, index, "genre");
+    }
+
 }

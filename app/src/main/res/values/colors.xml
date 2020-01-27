@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="md_cyan_500_25">#4000bcd4</color>
     <color name="colorPrimary">#E74948</color>
     <color name="colorPrimaryDark">@android:color/transparent</color>
     <color name="colorAccent">#FFC240</color>
@@ -281,7 +282,6 @@
     <color name="md_cyan_A200">#18ffff</color>
     <color name="md_cyan_A400">#00e5ff</color>
     <color name="md_cyan_A700">#00b8d4</color>
-    <color name="md_cyan_500_25">#4000bcd4</color>
     <color name="md_cyan_500_50">#8000bcd4</color>
     <color name="md_cyan_500_75">#c000bcd4</color>
     <!-- teals -->

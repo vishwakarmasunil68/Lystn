@@ -4,11 +4,13 @@ public class LanguagePOJO {
     int drawable_id;
     String name;
     boolean selected;
+    String language_code;
 
-    public LanguagePOJO(int drawable_id, String name, boolean selected) {
+    public LanguagePOJO(int drawable_id, String name, boolean selected,String language_code) {
         this.drawable_id = drawable_id;
         this.name = name;
         this.selected = selected;
+        this.language_code=language_code;
     }
 
     public int getDrawable_id() {
@@ -33,5 +35,13 @@ public class LanguagePOJO {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public String getLanguage_code() {
+        return language_code;
+    }
+
+    public void setLanguage_code(String language_code) {
+        this.language_code = language_code;
     }
 }

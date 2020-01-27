@@ -1,18 +1,25 @@
 package com.sundroid.lystn.fragment.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.sundroid.lystn.R;
 import com.sundroid.lystn.activity.HomeActivity;
+import com.sundroid.lystn.activity.LoginActivity;
 import com.sundroid.lystn.fragmentcontroller.FragmentController;
+import com.sundroid.lystn.pojo.UserPOJO;
+import com.sundroid.lystn.util.Pref;
+import com.sundroid.lystn.util.StringUtils;
+import com.sundroid.lystn.util.UtilityFunction;
 
 import butterknife.BindView;
 
@@ -24,6 +31,10 @@ public class MeFragment extends FragmentController {
     LinearLayout ll_subscription;
     @BindView(R.id.ll_language)
     LinearLayout ll_language;
+    @BindView(R.id.tv_user_name)
+    TextView tv_user_name;
+    @BindView(R.id.ll_logout)
+    LinearLayout ll_logout;
 
     @Nullable
     @Override
@@ -64,6 +75,27 @@ public class MeFragment extends FragmentController {
                     HomeActivity homeActivity= (HomeActivity) getActivity();
                     homeActivity.startSelectLangageFragment();
                 }
+            }
+        });
+
+        try{
+            UserPOJO userPOJO= UtilityFunction.getUserPOJO(getActivity().getApplicationContext());
+            if(userPOJO!=null){
+                tv_user_name.setText(userPOJO.getMobileNo());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        ll_logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Pref.SetStringPref(getActivity().getApplicationContext(),StringUtils.ARTISTE_FOLLOW_UP_STRING,"");
+                Pref.SetStringPref(getActivity().getApplicationContext(),StringUtils.GENRE_FOLLOW_UP_STRING,"");
+                Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.IS_USER_PROFILE_LOADED, false);
+                Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.IS_LOGIN,false);
+                startActivity(new Intent(getActivity(), LoginActivity.class));
+                getActivity().finishAffinity();
             }
         });
 

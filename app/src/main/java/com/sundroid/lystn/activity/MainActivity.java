@@ -21,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
     Button btn_login;
     @BindView(R.id.btn_home)
     Button btn_home;
+    @BindView(R.id.btn_testing)
+    Button btn_testing;
 
 
     @Override
@@ -50,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, HomeActivity.class));
+            }
+        });
+        btn_testing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, TestingActivity.class));
             }
         });
 

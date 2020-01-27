@@ -14,11 +14,13 @@
         android:gravity="center">
 
         <ImageView
+            android:id="@+id/iv_genre"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:src="@drawable/ll_square"/>
 
         <com.sundroid.lystn.view.RobotoRegularTV
+            android:id="@+id/tv_genre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#000000"

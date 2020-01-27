@@ -15,20 +15,32 @@
         android:layout_gravity="center"
         android:gravity="center">
 
-        <ImageView
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:src="@drawable/ll_disc"/>
+       <LinearLayout
+           android:layout_width="wrap_content"
+           android:layout_height="70dp">
+
+           <de.hdodenhof.circleimageview.CircleImageView
+               android:id="@+id/iv_artist"
+               android:layout_width="wrap_content"
+               android:layout_height="70dp"
+               android:src="@drawable/ll_disc"/>
+
+       </LinearLayout>
 
         <com.sundroid.lystn.view.RobotoRegularTV
+            android:id="@+id/tv_artist"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:textColor="#000000"
             android:textSize="12sp"
+            android:maxLines="2"
+            android:layout_gravity="center"
+            android:gravity="center"
             android:layout_marginTop="10dp"
             android:text="Artist Name"/>
 
         <LinearLayout
+            android:id="@+id/ll_follow"
             android:layout_width="70dp"
             android:layout_height="25dp"
             android:layout_gravity="center"
@@ -37,6 +49,7 @@
             android:background="@drawable/ic_follow">
 
             <com.sundroid.lystn.view.RobotoRegularTV
+                android:id="@+id/tv_follow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"

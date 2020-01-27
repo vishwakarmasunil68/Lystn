@@ -18,6 +18,9 @@ import com.sundroid.lystn.activity.LoginActivity;
 import com.sundroid.lystn.adapter.LanguageSelectAdapter;
 import com.sundroid.lystn.fragmentcontroller.FragmentController;
 import com.sundroid.lystn.pojo.LanguagePOJO;
+import com.sundroid.lystn.util.Pref;
+import com.sundroid.lystn.util.StringUtils;
+import com.sundroid.lystn.util.ToastClass;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,25 +49,15 @@ public class LoginSelectLanguageFragment extends FragmentController {
         super.onViewCreated(view, savedInstanceState);
 
 
-        languagePOJOS.add(new LanguagePOJO(R.drawable.icon_country_usa,"English",false));
-        languagePOJOS.add(new LanguagePOJO(R.drawable.icon_country_india,"Hindi",false));
-        languagePOJOS.add(new LanguagePOJO(R.drawable.icon_country_fran,"Francis",false));
-        languagePOJOS.add(new LanguagePOJO(R.drawable.icon_country_china,"Chinese",false));
-        languagePOJOS.add(new LanguagePOJO(R.drawable.icon_country_vie,"Vitenamese",false));
-        languagePOJOS.add(new LanguagePOJO(R.drawable.icon_country_japan,"Japenese",false));
-        languagePOJOS.add(new LanguagePOJO(R.drawable.icon_country_deutsch,"Deutsch",false));
+        languagePOJOS.add(new LanguagePOJO(R.drawable.icon_country_usa,"English",false,"en"));
+        languagePOJOS.add(new LanguagePOJO(R.drawable.icon_country_india,"Hindi",false,"hi"));
+        languagePOJOS.add(new LanguagePOJO(R.drawable.icon_country_fran,"Francis",false,"fr"));
+        languagePOJOS.add(new LanguagePOJO(R.drawable.icon_country_china,"Chinese",false,"ch"));
+        languagePOJOS.add(new LanguagePOJO(R.drawable.icon_country_vie,"Vitenamese",false,"vi"));
+        languagePOJOS.add(new LanguagePOJO(R.drawable.icon_country_japan,"Japenese",false,"ja"));
+        languagePOJOS.add(new LanguagePOJO(R.drawable.icon_country_deutsch,"Deutsch",false,"dtch"));
 
         attachAdapter();
-
-        frame_continue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(getActivity() instanceof LoginActivity){
-                    LoginActivity loginActivity= (LoginActivity) getActivity();
-                    loginActivity.startLoginDefaultFragment();
-                }
-            }
-        });
 
         tv_skip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,6 +69,30 @@ public class LoginSelectLanguageFragment extends FragmentController {
             }
         });
 
+        frame_continue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(checkSelected()==-1){
+                    ToastClass.showShortToast(getActivity().getApplicationContext(),"Please Select Language");
+                }else{
+//                    Pref.SetStringPref(getActivity(), StringUtils.USER_PREFER_LANGUAGE,languagePOJOS.get(checkSelected()).getLanguage_code());
+                    Pref.SetStringPref(getActivity(), StringUtils.USER_PREFER_LANGUAGE,"en");
+                    if(getActivity() instanceof LoginActivity){
+                        LoginActivity loginActivity= (LoginActivity) getActivity();
+                        loginActivity.startLoginDefaultFragment();
+                    }
+                }
+            }
+        });
+    }
+
+    private int checkSelected(){
+        for(int i=0;i<languagePOJOS.size();i++){
+            if(languagePOJOS.get(i).isSelected()){
+                return i;
+            }
+        }
+        return -1;
     }
 
     LanguageSelectAdapter languageSelectAdapter;

@@ -12,39 +12,58 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fillViewport="true">
+<!--        <ScrollView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"-->
+<!--            android:fillViewport="true">-->
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
-                <FrameLayout
+                <LinearLayout
+                    android:id="@+id/ll_home_content"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:padding="10dp">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-                    <com.sundroid.lystn.view.SFProBoldET
+                    <FrameLayout
+                        android:id="@+id/frame_search"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/ic_search_edit"
-                        android:paddingLeft="15dp"
-                        android:paddingRight="40dp" />
-
-                    <ImageView
-                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="right|center"
-                        android:layout_marginRight="15dp"
-                        android:src="@drawable/ic_mic" />
+                        android:layout_marginTop="10dp"
+                        android:padding="10dp">
 
-                </FrameLayout>
+                        <com.sundroid.lystn.view.SFProBoldET
+                            android:id="@+id/et_search"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/ic_search_edit"
+                            android:focusable="false"
+                            android:textSize="12sp"
+                            android:hint="Search Podcast, Shows"
+                            android:paddingLeft="15dp"
+                            android:paddingRight="40dp" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right|center"
+                            android:layout_marginRight="15dp"
+                            android:src="@drawable/ic_mic" />
+
+                    </FrameLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_home"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"></androidx.recyclerview.widget.RecyclerView>
+
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/ll_home_default"
@@ -53,238 +72,31 @@
                     android:orientation="vertical"
                     android:visibility="gone">
 
-                    <ImageView
+                    <com.facebook.shimmer.ShimmerFrameLayout
+                        android:id="@+id/shimmer_text"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:adjustViewBounds="true"
-                        android:src="@drawable/ic_home_default" />
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_horizontal">
 
-                </LinearLayout>
+                        <!--                        <TextView-->
+                        <!--                            android:layout_width="wrap_content"-->
+                        <!--                            android:layout_height="match_parent"-->
+                        <!--                            android:gravity="center"-->
+                        <!--                            android:text="ShimmerLayout"-->
+                        <!--                            android:textColor="@color/shimmer_background_color"-->
+                        <!--                            android:textSize="26sp"/>-->
 
-                <LinearLayout
-                    android:id="@+id/ll_home_content"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:visibility="visible">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingLeft="7dp"
-                        android:paddingRight="7dp"
-                        android:paddingBottom="5dp">
-
-                        <com.sundroid.lystn.view.RobotoBoldTV
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="7dp"
-                            android:text="Spotlight"
-                            android:textColor="#000000"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/rv_spotlight"
+                        <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"></androidx.recyclerview.widget.RecyclerView>
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/img_home_placeholder" />
 
-                    </LinearLayout>
+                    </com.facebook.shimmer.ShimmerFrameLayout>
 
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="7dp"
-                        android:layout_marginRight="7dp"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardElevation="2dp"
-                        app:cardUseCompatPadding="true">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:padding="7dp">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal">
-
-                                <com.sundroid.lystn.view.RobotoBoldTV
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
-                                    android:layout_weight="1"
-                                    android:text="Categories"
-                                    android:textColor="#000000"
-                                    android:textSize="18sp"
-                                    android:textStyle="bold" />
-
-                                <com.sundroid.lystn.view.RobotoRegularTV
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
-                                    android:text="See All"
-                                    android:textColor="#000000" />
-
-                            </LinearLayout>
-
-                            <androidx.recyclerview.widget.RecyclerView
-                                android:id="@+id/rv_categories"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"></androidx.recyclerview.widget.RecyclerView>
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="7dp"
-                        android:layout_marginRight="7dp"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardElevation="2dp"
-                        app:cardUseCompatPadding="true">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:padding="7dp">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal">
-
-                                <com.sundroid.lystn.view.RobotoBoldTV
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
-                                    android:layout_weight="1"
-                                    android:text="Artistes"
-                                    android:textColor="#000000"
-                                    android:textSize="18sp"
-                                    android:textStyle="bold" />
-
-                                <com.sundroid.lystn.view.RobotoRegularTV
-                                    android:id="@+id/tv_see_all_artist"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
-                                    android:text="See All"
-                                    android:textColor="#000000" />
-
-                            </LinearLayout>
-
-                            <androidx.recyclerview.widget.RecyclerView
-                                android:id="@+id/rv_artists"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"></androidx.recyclerview.widget.RecyclerView>
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="7dp"
-                        android:layout_marginRight="7dp"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardElevation="2dp"
-                        app:cardUseCompatPadding="true">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:padding="7dp">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal">
-
-                                <com.sundroid.lystn.view.RobotoBoldTV
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
-                                    android:layout_weight="1"
-                                    android:text="Genre/Topic"
-                                    android:textColor="#000000"
-                                    android:textSize="18sp"
-                                    android:textStyle="bold" />
-
-                                <com.sundroid.lystn.view.RobotoRegularTV
-                                    android:id="@+id/tv_all_genre"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
-                                    android:text="See All"
-                                    android:textColor="#000000" />
-
-                            </LinearLayout>
-
-                            <androidx.recyclerview.widget.RecyclerView
-                                android:id="@+id/rv_genre"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"></androidx.recyclerview.widget.RecyclerView>
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="7dp"
-                        android:layout_marginRight="7dp"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardElevation="2dp"
-                        app:cardUseCompatPadding="true">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:padding="7dp">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal">
-
-                                <com.sundroid.lystn.view.RobotoBoldTV
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
-                                    android:layout_weight="1"
-                                    android:text="Radio"
-                                    android:textColor="#000000"
-                                    android:textSize="18sp"
-                                    android:textStyle="bold" />
-
-                                <com.sundroid.lystn.view.RobotoRegularTV
-                                    android:id="@+id/tv_all_radio"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
-                                    android:text="See All"
-                                    android:textColor="#000000" />
-
-                            </LinearLayout>
-
-                            <androidx.recyclerview.widget.RecyclerView
-                                android:id="@+id/rv_radio"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"></androidx.recyclerview.widget.RecyclerView>
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
                 </LinearLayout>
 
             </LinearLayout>
-
-        </ScrollView>
 
         <LinearLayout
             android:id="@+id/ll_small_player"
@@ -292,9 +104,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:background="#F9F9F9"
+            android:visibility="gone"
             android:gravity="center_vertical">
 
             <ImageView
+                android:id="@+id/iv_player"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginLeft="15dp"
@@ -311,6 +125,7 @@
                 android:orientation="vertical">
 
                 <com.sundroid.lystn.view.HelveticaRegulatTV
+                    android:id="@+id/tv_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Housing Problem"
@@ -320,7 +135,7 @@
                 <com.sundroid.lystn.view.HelveticaRegulatTV
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="03:25 / 05:30" />
+                    android:text="--:-- / --:--" />
             </LinearLayout>
 
             <LinearLayout
@@ -332,15 +147,14 @@
                 android:layout_marginRight="15dp"
                 android:layout_marginBottom="5dp"
                 android:adjustViewBounds="true"
-                android:background="@drawable/ic_orange_round_circle"
                 android:gravity="center">
 
                 <ImageView
-                    android:layout_width="15dp"
+                    android:id="@+id/iv_play"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/ic_pause" />
-
+                    android:src="@drawable/ic_play" />
 
             </LinearLayout>
 

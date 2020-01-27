@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ActivityManager extends AppCompatActivity {
-    List<Fragment> fragmentList = new ArrayList<>();
+    public List<Fragment> fragmentList = new ArrayList<>();
     ProgressHUD mProgressHUD;
     public void startFragment(int id, Fragment fragment) {
         fragmentList.add(fragment);
@@ -99,6 +99,7 @@ public class ActivityManager extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        fragmentList.remove(fragmentList.size()-1);
         super.onBackPressed();
         Log.d(TagUtils.getTag(),"fragments size:-"+fragmentList.size());
     }
