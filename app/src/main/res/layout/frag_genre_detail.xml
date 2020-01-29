@@ -11,7 +11,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="44dp"
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="horizontal">
@@ -25,10 +25,9 @@
 
             <ImageView
                 android:id="@+id/iv_back"
-                android:layout_width="wrap_content"
-                android:layout_height="18dp"
-                android:layout_marginLeft="10dp"
-                android:adjustViewBounds="true"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="16dp"
                 android:src="@drawable/ic_back" />
         </LinearLayout>
 
@@ -48,7 +47,7 @@
 
             <ImageView
                 android:id="@+id/iv_download"
-                android:layout_width="25dp"
+                android:layout_width="24dp"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10dp"
                 android:adjustViewBounds="true"
@@ -60,8 +59,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
 
         <ImageView
             android:id="@+id/iv_podcast_image"
@@ -72,7 +73,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
             android:orientation="vertical">
 
@@ -88,7 +89,7 @@
                     android:layout_height="wrap_content"
                     android:text="NPR"
                     android:textColor="#000000"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <com.sundroid.lystn.view.RobotoRegularTV
@@ -97,7 +98,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:maxLines="2"
-                    android:text="Push up-to-date news every week" />
+                    android:text="Push up-to-date news every week"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
@@ -109,11 +111,20 @@
                 <Button
                     android:id="@+id/btn_follow"
                     android:layout_width="wrap_content"
-                    android:layout_height="30dp"
+                    android:layout_height="28dp"
                     android:layout_gravity="right|bottom"
                     android:background="@drawable/ic_follow"
                     android:text="Follow"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#FFFFFF"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/iv_favorited"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_gravity="right|bottom"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/ic_favorite" />
 
             </FrameLayout>
 
@@ -121,15 +132,48 @@
 
     </LinearLayout>
 
+    <!--    <com.borjabravo.readmoretextview.ReadMoreTextView-->
+    <!--        android:id="@+id/tv_podcast_description"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        app:trimLines="3"-->
+    <!--        app:trimLength="3"-->
+    <!--        android:textSize="12sp"-->
+    <!--        android:layout_marginTop="17dp"-->
+    <!--        android:paddingLeft="20dp"-->
+    <!--        android:paddingRight="20dp"-->
+    <!--        android:paddingBottom="17dp"-->
+    <!--        android:text="Description"-->
+    <!--        app:trimCollapsedText="more"-->
+    <!--        app:trimMode="trimModeLine"/>-->
+
+    <!--    <com.abdulhakeem.seemoretextview.SeeMoreTextView-->
+    <!--        android:id="@+id/tv_podcast_description"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content" />-->
+
     <com.sundroid.lystn.view.RobotoRegularTV
         android:id="@+id/tv_podcast_description"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingBottom="10dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="12dp"
         android:maxLines="3"
-        android:text="Description" />
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="17dp"
+        android:padding="5dp"
+        android:text="Comedian Larry Miller tells uplifting stories from his own life, in the tradition of great radio raconteurs like Jean Shepherd and Prarie Home Companion. Tune in to the fireside chat for the 21st century. It's time well spent! Larry Miller is best known for roles in Waiting For Guffman, Best in Show and 10 Things I Hate About You, as well as his standup comedy. Now he brings his sharp wit and genteel manner to his very own podcast. And it's the only podcast recorded from inside an extinct volcano!"
+        android:background="@drawable/ic_description_back"
+        android:textSize="12sp" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="17dp"
+        android:src="@drawable/ic_premium"/>
 
     <View
         android:layout_width="match_parent"
@@ -146,33 +190,35 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="7dp"
-            android:layout_marginTop="7dp"
-            android:layout_marginRight="7dp"
             android:layout_weight="1"
             android:gravity="center"
+            android:minHeight="40dp"
             android:orientation="vertical">
 
-            <com.sundroid.lystn.view.RobotoBoldTV
+            <com.sundroid.lystn.view.RobotoMediumTV
                 android:id="@+id/tv_frag_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center"
                 android:text="Playlists"
                 android:textColor="#000000"
-                android:textSize="16sp" />
+                android:textSize="17sp" />
 
             <View
                 android:id="@+id/view_frag_1"
-                android:layout_width="50dp"
+                android:layout_width="30dp"
                 android:layout_height="2dp"
-                android:layout_marginTop="10dp"
                 android:background="#FFFF8C00" />
 
         </LinearLayout>
@@ -181,27 +227,120 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="7dp"
-            android:layout_marginTop="7dp"
-            android:layout_marginRight="7dp"
             android:layout_weight="1"
             android:gravity="center"
+            android:minHeight="40dp"
             android:orientation="vertical">
 
-            <com.sundroid.lystn.view.RobotoBoldTV
+            <com.sundroid.lystn.view.RobotoMediumTV
                 android:id="@+id/tv_frag_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center"
                 android:text="Recommend"
-                android:textColor="#000000" />
+                android:textColor="#000000"
+                android:textSize="17sp" />
 
             <View
                 android:id="@+id/view_frag_2"
-                android:layout_width="50dp"
+                android:layout_width="30dp"
                 android:layout_height="2dp"
-                android:layout_marginTop="10dp"
                 android:background="#FFFF8C00"
                 android:visibility="invisible" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="54dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center_vertical">
+
+            <com.sundroid.lystn.view.RobotoMediumTV
+                android:id="@+id/tv_phases"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:text="Phases"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_download_episode" />
+
+            <com.sundroid.lystn.view.RobotoRegularTV
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Download"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="15dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_sort" />
+
+            <com.sundroid.lystn.view.RobotoRegularTV
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Sort"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_anthology" />
+
+            <com.sundroid.lystn.view.RobotoRegularTV
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Anthology"
+                android:textSize="10sp" />
 
         </LinearLayout>
 
@@ -211,7 +350,9 @@
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="10dp">
+        android:layout_marginLeft="7dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="7dp">
 
     </androidx.viewpager.widget.ViewPager>
 

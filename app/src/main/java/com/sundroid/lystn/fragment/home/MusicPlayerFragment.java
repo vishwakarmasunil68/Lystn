@@ -3,8 +3,11 @@ package com.sundroid.lystn.fragment.home;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -12,16 +15,32 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.sundroid.lystn.R;
 import com.sundroid.lystn.activity.HomeActivity;
+import com.sundroid.lystn.adapter.QueueAdapter;
 import com.sundroid.lystn.fragmentcontroller.FragmentController;
+import com.sundroid.lystn.pojo.artiste.PodcastDetailPOJO;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
 import com.sundroid.lystn.util.Pref;
 import com.sundroid.lystn.util.StringUtils;
 import com.sundroid.lystn.util.TagUtils;
+import com.sundroid.lystn.webservice.ApiCallBase;
+import com.sundroid.lystn.webservice.WebServicesCallBack;
+import com.sundroid.lystn.webservice.WebServicesUrls;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
 
 import butterknife.BindView;
 import jp.wasabeef.glide.transformations.BlurTransformation;
@@ -42,17 +61,55 @@ public class MusicPlayerFragment extends FragmentController {
     LinearLayout ll_minimize;
     @BindView(R.id.iv_next)
     ImageView iv_next;
-    @BindView(R.id.iv_previous)
-    ImageView iv_previous;
+    @BindView(R.id.ll_queue)
+    LinearLayout ll_queue;
     @BindView(R.id.iv_player_background)
     ImageView iv_player_background;
     @BindView(R.id.tv_description)
     TextView tv_description;
+    @BindView(R.id.tv_current_time)
+    TextView tv_current_time;
+    @BindView(R.id.tv_total_duration)
+    TextView tv_total_duration;
+    @BindView(R.id.ic_download)
+    ImageView ic_download;
+    @BindView(R.id.iv_podcast_image)
+    ImageView iv_podcast_image;
+    @BindView(R.id.tv_podcast_name)
+    TextView tv_podcast_name;
+    @BindView(R.id.tv_podcast_copy_right)
+    TextView tv_podcast_copy_right;
+    @BindView(R.id.cv_podcast)
+    CardView cv_podcast;
+    @BindView(R.id.btn_follow)
+    Button btn_follow;
+    @BindView(R.id.ll_seekBar)
+    LinearLayout ll_seekBar;
+    @BindView(R.id.ll_previous)
+    LinearLayout ll_previous;
+    @BindView(R.id.ll_next)
+    LinearLayout ll_next;
+    @BindView(R.id.rv_queue_list)
+    RecyclerView rv_queue_list;
+    @BindView(R.id.coordinator)
+    CoordinatorLayout coordinator;
+    @BindView(R.id.frame_bottom_sheet)
+    FrameLayout frame_bottom_sheet;
+    @BindView(R.id.frame_rv)
+    FrameLayout frame_rv;
+    BottomSheetBehavior bottomSheetBehavior;
 
-    HomeContentPOJO homeContentPOJO;
+    PodcastDetailPOJO podcastDetailPOJO;
+    List<HomeContentPOJO> homeContentPOJOS;
+    int position;
 
-    public MusicPlayerFragment(HomeContentPOJO homeContentPOJO) {
-        this.homeContentPOJO = homeContentPOJO;
+    boolean onRVTouch=false;
+
+    public MusicPlayerFragment(List<HomeContentPOJO> homeContentPOJOS, int position, PodcastDetailPOJO podcastDetailPOJO) {
+        this.homeContentPOJOS = homeContentPOJOS;
+        this.position = position;
+        this.podcastDetailPOJO = podcastDetailPOJO;
+//        Log.d(TagUtils.getTag(),"homecontentpojos:-"+homeContentPOJOS.size());
     }
 
     @Nullable
@@ -66,6 +123,41 @@ public class MusicPlayerFragment extends FragmentController {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+
+        attachQueueAdapter();
+//        this.homeContentPOJOS.clear();
+//        queueAdapter.notifyDataSetChanged();
+
+        bottomSheetBehavior = BottomSheetBehavior.from((view.findViewById(R.id.frame_bottom_sheet)));
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View view, int i) {
+                if(onRVTouch){
+                    if (i == BottomSheetBehavior.STATE_DRAGGING) {
+                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View view, float v) {
+
+            }
+        });
+
+        ll_queue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TagUtils.getTag(), "queue clicked");
+                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                } else {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
+            }
+        });
 
 
         ll_minimize.setOnClickListener(new View.OnClickListener() {
@@ -104,25 +196,148 @@ public class MusicPlayerFragment extends FragmentController {
             }
         });
 
-        iv_previous.setOnClickListener(new View.OnClickListener() {
+//        iv_previous.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (!Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.MEDIA_TYPE, "").equals("radio")) {
+//                    if (getActivity() instanceof HomeActivity) {
+//                        HomeActivity homeActivity = (HomeActivity) getActivity();
+//                        homeActivity.previousSong();
+//                    }
+//                }
+//            }
+//        });
+
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            //            boolean is_touched=false;
             @Override
-            public void onClick(View v) {
-                if (!Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.MEDIA_TYPE, "").equals("radio")) {
-                    if (getActivity() instanceof HomeActivity) {
-                        HomeActivity homeActivity = (HomeActivity) getActivity();
-                        homeActivity.previousSong();
-                    }
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//                Log.d(TagUtils.getTag(),"seekbar progress changed:-"+progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                Log.d(TagUtils.getTag(), "seekbar progress changed:-" + seekBar.getProgress());
+                if (getActivity() instanceof HomeActivity) {
+                    HomeActivity homeActivity = (HomeActivity) getActivity();
+                    homeActivity.seekMediaPlayer(seekBar.getProgress());
                 }
             }
         });
 
+        btn_follow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (podcastDetailPOJO != null) {
+                    if (getActivity() instanceof HomeActivity) {
+                        HomeActivity homeActivity = (HomeActivity) getActivity();
+                        if (homeActivity.getArtisteFollowUpList().contains(String.valueOf(podcastDetailPOJO.getPodcastId()))) {
+                            homeActivity.showProgressBar();
+                            JSONObject jsonObject = new JSONObject();
 
+                            try {
+                                jsonObject.put("userId", Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.USER_ID, ""));
+                                jsonObject.put("deviceId", "91");
+                                jsonObject.put("followType", "artiste");
+                                jsonObject.put("followId", String.valueOf(podcastDetailPOJO.getPodcastId()));
+                                jsonObject.put("langCode", "en");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            new ApiCallBase(getActivity(), new WebServicesCallBack() {
+                                @Override
+                                public void onGetMsg(String apicall, String response) {
+                                    homeActivity.dismissProgressBar();
+                                    try {
+                                        String object = new String(response);
+                                        JSONObject jsonObject = new JSONObject(object);
+                                        JSONObject responseObject = jsonObject.optJSONObject("response");
+//                                    ArtisteFollowUtil.removeArtisteFromList(activity.getApplicationContext(),String.valueOf(items.get(position).getConId()));
+//                                    homeActivity.getArtisteFollowUpList().remove(items.get(position).getConId());
+                                        homeActivity.removeFollowUP(StringUtils.ARTISTE_FOLLOW_UP_STRING, String.valueOf(podcastDetailPOJO.getPodcastId()));
+//                                    Log.d(TagUtils.getTag(),"artiste list:-"+ArtisteFollowUtil.getArtisteList(activity.getApplicationContext()));
+
+                                        changeFollowText(String.valueOf(podcastDetailPOJO.getPodcastId()));
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                @Override
+                                public void onErrorMsg(String status_code, String response) {
+
+                                }
+                            }, "UNFOLLOW_API").makeApiCall(WebServicesUrls.UNFOLLOW_API, jsonObject);
+                        } else {
+                            JSONObject jsonObject = new JSONObject();
+                            homeActivity.showProgressBar();
+                            try {
+                                jsonObject.put("userId", Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.USER_ID, ""));
+                                jsonObject.put("deviceId", "91");
+                                jsonObject.put("followType", "artiste");
+                                jsonObject.put("followId", String.valueOf(podcastDetailPOJO.getPodcastId()));
+                                jsonObject.put("langCode", "en");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+
+                            new ApiCallBase(getActivity(), new WebServicesCallBack() {
+                                @Override
+                                public void onGetMsg(String apicall, String response) {
+                                    homeActivity.dismissProgressBar();
+                                    try {
+                                        String object = new String(response);
+                                        JSONObject jsonObject = new JSONObject(object);
+                                        JSONObject responseObject = jsonObject.optJSONObject("response");
+//                                    ArtisteFollowUtil.addFollowArtiste(activity.getApplicationContext(), String.valueOf(items.get(position).getConId()));
+//                                    Log.d(TagUtils.getTag(), jsonObject.toString());
+//                                    Log.d(TagUtils.getTag(),"artiste list:-"+ArtisteFollowUtil.getArtisteList(activity.getApplicationContext()));
+
+                                        homeActivity.addFollowUpData(StringUtils.ARTISTE_FOLLOW_UP_STRING, String.valueOf(podcastDetailPOJO.getPodcastId()));
+
+//                                    homeActivity.getArtisteFollowUpList().add(items.get(position).getConId());
+
+                                        changeFollowText(String.valueOf(podcastDetailPOJO.getPodcastId()));
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                @Override
+                                public void onErrorMsg(String status_code, String response) {
+
+                                }
+                            }, "FOLLOW_API").makeApiCall(WebServicesUrls.FOLLOW_API, jsonObject);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    public void changeFollowText(String conId) {
+        if (getActivity() instanceof HomeActivity) {
+            HomeActivity homeActivity = (HomeActivity) getActivity();
+            if (homeActivity.getArtisteFollowUpList().contains(conId)) {
+                btn_follow.setText("Unfollow");
+            } else {
+                btn_follow.setText("Follow");
+            }
+        }
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        setHomeContentPOJO(homeContentPOJO);
+        setHomeContentPOJO(position);
     }
 
     @Override
@@ -134,23 +349,21 @@ public class MusicPlayerFragment extends FragmentController {
         super.onDestroy();
     }
 
-    public void setHomeContentPOJO(HomeContentPOJO homeContentPOJO) {
-        this.homeContentPOJO = homeContentPOJO;
+    public void setHomeContentPOJO(int position) {
         Glide.with(getActivity())
-                .load(homeContentPOJO.getImgIrl())
+                .load(homeContentPOJOS.get(position).getImgIrl())
                 .placeholder(R.drawable.ll_square)
                 .error(R.drawable.ll_square)
                 .dontAnimate()
                 .into(iv_player);
 
-//        Glide.with(getActivity())
-//                .load(homeContentPOJO.getImgIrl())
-//                .placeholder(R.drawable.ll_square)
-//                .error(R.drawable.ll_square)
-//                .dontAnimate()
-//                .into(iv_player_background);
+        for(HomeContentPOJO homeContentPOJO:homeContentPOJOS){
+            homeContentPOJO.setPlaying(false);
+        }
 
-        Glide.with(this).load(homeContentPOJO.getImgIrl())
+        homeContentPOJOS.get(position).setPlaying(true);
+
+        Glide.with(this).load(homeContentPOJOS.get(position).getImgIrl())
                 .apply(RequestOptions.bitmapTransform(new BlurTransformation(50, 5)))
                 .into(iv_player_background);
 
@@ -158,16 +371,107 @@ public class MusicPlayerFragment extends FragmentController {
 //                .biu(new BlurTransformation(context))
 //                .into((ImageView) findViewById(R.id.image));
 
-        tv_name.setText(homeContentPOJO.getConName());
+        tv_name.setText(homeContentPOJOS.get(position).getConName());
 
-        if (homeContentPOJO.getDescription() != null && !(homeContentPOJO.getDescription().equalsIgnoreCase(""))) {
-            tv_description.setText(homeContentPOJO.getDescription());
+        if (homeContentPOJOS.get(position).getDescription() != null && !(homeContentPOJOS.get(position).getDescription().equalsIgnoreCase(""))) {
+            tv_description.setText(homeContentPOJOS.get(position).getDescription());
+        }
+
+        if (Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.MEDIA_TYPE, "").equalsIgnoreCase("radio")) {
+            ic_download.setVisibility(View.GONE);
+            ll_seekBar.setVisibility(View.GONE);
+            ll_next.setVisibility(View.GONE);
+            ll_previous.setVisibility(View.GONE);
+        } else {
+            ic_download.setVisibility(View.VISIBLE);
+            ll_seekBar.setVisibility(View.VISIBLE);
+            ll_next.setVisibility(View.VISIBLE);
+            ll_previous.setVisibility(View.VISIBLE);
         }
 
         if (getActivity() instanceof HomeActivity) {
             HomeActivity homeActivity = (HomeActivity) getActivity();
             homeActivity.checkPlayerRunning();
         }
+        if (podcastDetailPOJO != null) {
+            cv_podcast.setVisibility(View.VISIBLE);
+            Glide.with(getActivity())
+                    .load(podcastDetailPOJO.getImgLocalUri())
+                    .placeholder(R.drawable.ll_square)
+                    .error(R.drawable.ll_square)
+                    .dontAnimate()
+                    .into(iv_podcast_image);
+
+            tv_podcast_name.setText(podcastDetailPOJO.getTitle());
+            tv_podcast_copy_right.setText(podcastDetailPOJO.getCopyright());
+        } else {
+            cv_podcast.setVisibility(View.GONE);
+        }
+        queueAdapter.notifyDataSetChanged();
+
+        rv_queue_list.post(new Runnable() {
+            @Override
+            public void run() {
+                rv_queue_list.scrollToPosition(position);
+                // Here adapter.getItemCount()== child count
+            }
+        });
+
+        frame_rv.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TagUtils.getTag(),"frame touch");
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                onRVTouch=true;
+                switch(event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        Log.d(TagUtils.getTag(),"Action Down");
+                        // touch down code
+//                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        // touch move code
+//                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        Log.d(TagUtils.getTag(),"Action UP");
+                        onRVTouch=false;
+                        // touch up code
+                        break;
+                }
+                return false;
+            }
+        });
+
+        rv_queue_list.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TagUtils.getTag(),"rv_queue touch");
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                onRVTouch=true;
+                switch(event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        Log.d(TagUtils.getTag(),"Action Down");
+                        // touch down code
+//                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        // touch move code
+//                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        Log.d(TagUtils.getTag(),"Action UP");
+                        onRVTouch=false;
+                        // touch up code
+                        break;
+                }
+                return false;
+            }
+        });
     }
 
     public void setPlayImage(boolean is_playing) {
@@ -177,5 +481,50 @@ public class MusicPlayerFragment extends FragmentController {
         } else {
             iv_play.setImageResource(R.drawable.ic_play);
         }
+    }
+
+    public void updateTimings(int current_time, int media_duration) {
+        seekBar.setMax(media_duration);
+        seekBar.setProgress(current_time);
+
+        tv_current_time.setText(getMinSec(current_time));
+        tv_total_duration.setText(getMinSec(media_duration));
+    }
+
+    public String getMinSec(int current_time) {
+        int total_seconds = (int) (current_time / 1000);
+        int minutes = total_seconds / 60;
+        int seconds = total_seconds % 60;
+
+        String min = "";
+
+        if (minutes < 10) {
+            min = "0" + String.valueOf(minutes);
+        } else {
+            min = String.valueOf(minutes);
+        }
+
+        String sec = "";
+
+        if (seconds < 10) {
+            sec = "0" + String.valueOf(seconds);
+        } else {
+            sec = String.valueOf(seconds);
+        }
+
+        return min + " : " + sec;
+    }
+
+    QueueAdapter queueAdapter;
+
+    public void attachQueueAdapter() {
+        Log.d(TagUtils.getTag(), "content pojos length:-" + homeContentPOJOS.size());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        rv_queue_list.setHasFixedSize(true);
+        rv_queue_list.setLayoutManager(linearLayoutManager);
+        queueAdapter = new QueueAdapter(getActivity(), this, homeContentPOJOS);
+        rv_queue_list.setAdapter(queueAdapter);
+        rv_queue_list.setNestedScrollingEnabled(false);
+        rv_queue_list.setItemAnimator(new DefaultItemAnimator());
     }
 }

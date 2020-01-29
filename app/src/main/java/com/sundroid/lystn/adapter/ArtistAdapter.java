@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.sundroid.lystn.R;
 import com.sundroid.lystn.activity.HomeActivity;
-import com.sundroid.lystn.fragment.home.MusicPlayerFragment;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
 import com.sundroid.lystn.util.Pref;
 import com.sundroid.lystn.util.StringUtils;
@@ -85,10 +84,10 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
                         homeActivity.startPodcastFragment(items.get(position).getConId());
                     }
                 } else if (type.equalsIgnoreCase("radio")) {
-                    if (activity instanceof HomeActivity) {
-                        HomeActivity homeActivity = (HomeActivity) activity;
-                        homeActivity.startFragment(R.id.frame_main, new MusicPlayerFragment(items.get(position)));
-                    }
+//                    if (activity instanceof HomeActivity) {
+//                        HomeActivity homeActivity = (HomeActivity) activity;
+//                        homeActivity.startFragment(R.id.frame_main, new MusicPlayerFragment(items.get(position)));
+//                    }
                 } else if (type.equalsIgnoreCase("artiste")) {
                     if (activity instanceof HomeActivity) {
                         HomeActivity homeActivity = (HomeActivity) activity;

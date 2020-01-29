@@ -1,5 +1,6 @@
 package com.sundroid.lystn.fragment.home;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.sundroid.lystn.adapter.ViewPagerAdapter;
 import com.sundroid.lystn.fragment.playlist.PodcastPlayListFragment;
 import com.sundroid.lystn.fragment.playlist.RecommendListFragment;
 import com.sundroid.lystn.fragmentcontroller.FragmentController;
+import com.sundroid.lystn.pojo.artiste.PodcastDetailPOJO;
 import com.sundroid.lystn.pojo.artiste.PodcastPOJO;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
 import com.sundroid.lystn.util.Pref;
@@ -62,6 +64,12 @@ public class GenreDetailFragment extends FragmentController {
     ViewPager viewPager;
     @BindView(R.id.btn_follow)
     Button btn_follow;
+    @BindView(R.id.iv_favorited)
+    ImageView iv_favorited;
+    @BindView(R.id.tv_phases)
+    TextView tv_phases;
+
+    PodcastDetailPOJO podcastDetailPOJO;
 
     List<TextView> textViews = new ArrayList<>();
     List<View> views = new ArrayList<>();
@@ -103,6 +111,13 @@ public class GenreDetailFragment extends FragmentController {
         getPodcastDetails();
 
         changeFollowText();
+
+        iv_favorited.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btn_follow.callOnClick();
+            }
+        });
 
         btn_follow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -195,13 +210,17 @@ public class GenreDetailFragment extends FragmentController {
 
     }
 
-    public void changeFollowText(){
+    public void changeFollowText() {
         if (getActivity() instanceof HomeActivity) {
             HomeActivity homeActivity = (HomeActivity) getActivity();
             if (homeActivity.getArtisteFollowUpList().contains(conId)) {
-                btn_follow.setText("unfollow");
+//                btn_follow.setText("unfollow");
+                btn_follow.setVisibility(View.GONE);
+                iv_favorited.setVisibility(View.VISIBLE);
             } else {
-                btn_follow.setText("follow");
+//                btn_follow.setText("follow");
+                btn_follow.setVisibility(View.VISIBLE);
+                iv_favorited.setVisibility(View.GONE);
             }
         }
     }
@@ -233,9 +252,15 @@ public class GenreDetailFragment extends FragmentController {
 
                         PodcastPOJO podcastPOJO = new Gson().fromJson(responseObject.optJSONObject("podcast").toString(), PodcastPOJO.class);
 
+                        podcastDetailPOJO = podcastPOJO.getPodcastDetailPOJO();
 
                         tv_podcast_name.setText(podcastPOJO.getPodcastDetailPOJO().getTitle());
+//                        tv_podcast_description.setContent(podcastPOJO.getPodcastDetailPOJO().getDescription());
+//                        tv_podcast_description.setTextMaxLength(150);
+//                        tv_podcast_description.setSeeMoreText("More","Less");
+//                        tv_podcast_description.setSeeMoreTextColor(Color.parseColor("#FF8C00"));
                         tv_podcast_description.setText(podcastPOJO.getPodcastDetailPOJO().getDescription());
+
                         tv_podcast_copy_right.setText(podcastPOJO.getPodcastDetailPOJO().getCopyright());
 
                         Glide.with(getActivity())
@@ -246,7 +271,8 @@ public class GenreDetailFragment extends FragmentController {
                                 .into(iv_podcast_image);
 
 //                        podcastEpisodeDetailsPOJOS.addAll(podcastPOJO.getPodcastEpisodeDetailsPOJOS());
-                            podcastPlayListFragment.setPodcastList(podcastPOJO.getPodcastEpisodeDetailsPOJOS());
+                        podcastPlayListFragment.setPodcastList(podcastPOJO.getPodcastDetailPOJO(), podcastPOJO.getPodcastEpisodeDetailsPOJOS());
+                        tv_phases.setText(podcastPOJO.getPodcastEpisodeDetailsPOJOS().size() + " Phases");
 
                     } else {
                         ToastClass.showShortToast(getActivity().getApplicationContext(), "Something went wrong");
@@ -296,23 +322,22 @@ public class GenreDetailFragment extends FragmentController {
     }
 
     public void makeTabSelected(int position) {
-
         for (int i = 0; i < views.size(); i++) {
             views.get(i).setVisibility(View.INVISIBLE);
         }
         views.get(position).setVisibility(View.VISIBLE);
 
-//        for (int i = 0; i < textViews.size(); i++) {
-//            textViews.get(i).setTextSize(14);
-//        }
-//        textViews.get(position).setTextSize(16);
+        for (int i = 0; i < textViews.size(); i++) {
+            textViews.get(i).setTextColor(Color.parseColor("#000000"));
+        }
+        textViews.get(position).setTextColor(Color.parseColor("#FFFF8C00"));
     }
 
 
     public void playEpisode(List<HomeContentPOJO> homeContentPOJOS, int index) {
         if (getActivity() instanceof HomeActivity) {
             HomeActivity homeActivity = (HomeActivity) getActivity();
-            homeActivity.playAudio(homeContentPOJOS, index, "genre");
+            homeActivity.playAudio(homeContentPOJOS, index, "genre", podcastDetailPOJO);
         }
     }
 

@@ -12,153 +12,87 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-<!--        <ScrollView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_weight="1"-->
-<!--            android:fillViewport="true">-->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:id="@+id/ll_home_content"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <FrameLayout
-                        android:id="@+id/frame_search"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:padding="10dp">
-
-                        <com.sundroid.lystn.view.SFProBoldET
-                            android:id="@+id/et_search"
-                            android:layout_width="match_parent"
-                            android:layout_height="40dp"
-                            android:layout_gravity="center"
-                            android:background="@drawable/ic_search_edit"
-                            android:focusable="false"
-                            android:textSize="12sp"
-                            android:hint="Search Podcast, Shows"
-                            android:paddingLeft="15dp"
-                            android:paddingRight="40dp" />
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="right|center"
-                            android:layout_marginRight="15dp"
-                            android:src="@drawable/ic_mic" />
-
-                    </FrameLayout>
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_home"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"></androidx.recyclerview.widget.RecyclerView>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/ll_home_default"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <com.facebook.shimmer.ShimmerFrameLayout
-                        android:id="@+id/shimmer_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center_horizontal">
-
-                        <!--                        <TextView-->
-                        <!--                            android:layout_width="wrap_content"-->
-                        <!--                            android:layout_height="match_parent"-->
-                        <!--                            android:gravity="center"-->
-                        <!--                            android:text="ShimmerLayout"-->
-                        <!--                            android:textColor="@color/shimmer_background_color"-->
-                        <!--                            android:textSize="26sp"/>-->
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:adjustViewBounds="true"
-                            android:src="@drawable/img_home_placeholder" />
-
-                    </com.facebook.shimmer.ShimmerFrameLayout>
-
-                </LinearLayout>
-
-            </LinearLayout>
+        <!--        <ScrollView-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_weight="1"-->
+        <!--            android:fillViewport="true">-->
 
         <LinearLayout
-            android:id="@+id/ll_small_player"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:background="#F9F9F9"
-            android:visibility="gone"
-            android:gravity="center_vertical">
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/iv_player"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:adjustViewBounds="true"
-                android:src="@drawable/ic_song_small" />
+            <FrameLayout
+                android:id="@+id/frame_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:padding="10dp">
+
+                <com.sundroid.lystn.view.SFProBoldET
+                    android:id="@+id/et_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_search_edit"
+                    android:focusable="false"
+                    android:hint="Search Podcast, Shows"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="40dp"
+                    android:textSize="12sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|center"
+                    android:layout_marginRight="15dp"
+                    android:src="@drawable/ic_mic" />
+
+            </FrameLayout>
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="1"
+                android:id="@+id/ll_home_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <com.sundroid.lystn.view.HelveticaRegulatTV
-                    android:id="@+id/tv_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Housing Problem"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_home"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"></androidx.recyclerview.widget.RecyclerView>
 
-                <com.sundroid.lystn.view.HelveticaRegulatTV
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="--:-- / --:--" />
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="15dp"
-                android:layout_marginBottom="5dp"
-                android:adjustViewBounds="true"
-                android:gravity="center">
+                android:id="@+id/ll_home_default"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="visible"
+                android:paddingLeft="7dp"
+                android:paddingRight="7dp">
 
-                <ImageView
-                    android:id="@+id/iv_play"
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmer_text"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:adjustViewBounds="true"
-                    android:src="@drawable/ic_play" />
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_horizontal">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/img_home_placeholder" />
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
 
             </LinearLayout>
 
         </LinearLayout>
+
+
     </LinearLayout>
 
 </FrameLayout>

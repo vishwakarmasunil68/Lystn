@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.media.session.MediaSessionManager;
 import android.os.AsyncTask;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -69,6 +70,18 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
     public void onCreate() {
         super.onCreate();
 
+        new CountDownTimer(1000000000, 1000) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                updateMediaTiming();
+            }
+
+            @Override
+            public void onFinish() {
+
+            }
+        }.start();
         Log.d(TagUtils.getTag(), "oncreate service");
     }
 
@@ -284,6 +297,10 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
                     } else {
                         playingStatusInHome(false);
                     }
+                } else if (type.equalsIgnoreCase(StringUtils.SEEK_PLAYER)) {
+                    if (mediaPlayer != null) {
+                        mediaPlayer.seekTo(intent.getIntExtra(StringUtils.SEEK_PROGRESS, 0));
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -323,9 +340,17 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public void updateMediaTiming() {
-        if (!Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").equals("radio")) {
+        if ((mediaPlayer != null) && (mediaPlayer.isPlaying()) && !Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").equals("radio")) {
             Intent intent = new Intent(StringUtils.UPDATE_HOME_ACTIVITY);
-            intent.putExtra("type", StringUtils.NEXT_SONG);
+            intent.putExtra("type", StringUtils.MEDIA_TIMINGS);
+            intent.putExtra(StringUtils.MEDIA_DURATION, mediaPlayer.getDuration());
+            intent.putExtra(StringUtils.CURRENT_MEDIA_TIME, mediaPlayer.getCurrentPosition());
+            sendBroadcast(intent);
+        } else {
+            Intent intent = new Intent(StringUtils.UPDATE_HOME_ACTIVITY);
+            intent.putExtra("type", StringUtils.MEDIA_TIMINGS);
+            intent.putExtra(StringUtils.MEDIA_DURATION, 0);
+            intent.putExtra(StringUtils.CURRENT_MEDIA_TIME, 0);
             sendBroadcast(intent);
         }
     }
@@ -339,7 +364,7 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public void updateTiminginMusicPlayer() {
-        if(mediaPlayer!=null){
+        if (mediaPlayer != null) {
             Intent intent = new Intent(StringUtils.UPDATE_HOME_ACTIVITY);
             intent.putExtra("type", StringUtils.NEXT_SONG);
             sendBroadcast(intent);
@@ -379,9 +404,8 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
         dismissHomeProgressBar();
         isMediaPlayerSetOnce = true;
         playMedia();
-        if (!Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").equals("radio")) {
+        updateMediaTiming();
 
-        }
     }
 
     private void dismissHomeProgressBar() {
@@ -492,7 +516,12 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
                     Log.d(TagUtils.getTag(), "setting notification metadata");
                     mBuilder.setLargeIcon(theBitmap);
                     mBuilder.setContentText(homeContentPOJO.getConName());
-                    mBuilder.setContentTitle(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, ""));
+                    if(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").equalsIgnoreCase("radio")){
+                        mBuilder.setContentTitle(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, ""));
+                    }else{
+                        mBuilder.setContentTitle(Pref.GetStringPref(getApplicationContext(),StringUtils.NOTIFICAION_ALBUM_NAME,""));
+                    }
+
                     mBuilder.setContentInfo(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, ""));
                     notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
                 }

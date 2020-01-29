@@ -65,8 +65,13 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                                     items.get(position).getBkType().equalsIgnoreCase("radio") ||
                                     items.get(position).getBkType().equalsIgnoreCase("artiste")
                     ) {
-                        HomeActivity homeActivity = (HomeActivity) activity;
-                        homeActivity.showHomeAllContentFragment(items.get(position));
+                        if(items.get(position).getBkType().equalsIgnoreCase("radio")){
+                            HomeActivity homeActivity = (HomeActivity) activity;
+                            homeActivity.showAllRadioContentFragment(items.get(position));
+                        }else{
+                            HomeActivity homeActivity = (HomeActivity) activity;
+                            homeActivity.showHomeAllContentFragment(items.get(position));
+                        }
                     }
                 }
             });

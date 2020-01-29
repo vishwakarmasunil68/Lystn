@@ -56,5 +56,8 @@ dependencies {
     implementation 'com.hbb20:ccp:2.3.6'
 //    implementation 'io.supercharge:shimmerlayout:2.1.0'
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
+    compile 'com.borjabravo:readmoretextview:2.1.0'
+    implementation 'com.github.AhmMhd:SeeMoreTextView-Android:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
 }
 apply plugin: 'com.google.gms.google-services'

@@ -46,7 +46,7 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:layout_marginTop="10dp"
-            android:background="@drawable/ic_follow">
+            android:background="@drawable/ic_detail_follow_btn">
 
             <com.sundroid.lystn.view.RobotoRegularTV
                 android:id="@+id/tv_follow"

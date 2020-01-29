@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.sundroid.lystn.R;
-import com.sundroid.lystn.fragment.home.ArtisteDetailFragment;
+import com.sundroid.lystn.fragment.playlist.PodcastPlayListFragment;
 import com.sundroid.lystn.pojo.artiste.PodcastEpisodeDetailsPOJO;
 
 import java.util.List;
@@ -42,8 +42,8 @@ public class GenrePlayListAdapter extends RecyclerView.Adapter<GenrePlayListAdap
 
         holder.tv_episode_name.setText(items.get(position).getTitle());
         holder.tv_date.setText(items.get(position).getAddedOn());
-        holder.tv_duration.setText(items.get(position).getDuration());
-        holder.tv_sequence.setText(items.get(position).getEpisodeSeq());
+        holder.tv_duration.setText(String.valueOf(items.get(position).getDuration()));
+        holder.tv_sequence.setText(String.valueOf(items.get(position).getEpisodeSeq()));
 //        Glide.with(activity)
 //                .load(items.get(position).getImgLocalUri())
 //                .placeholder(R.drawable.ll_disc)
@@ -54,10 +54,11 @@ public class GenrePlayListAdapter extends RecyclerView.Adapter<GenrePlayListAdap
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(fragment !=null && fragment instanceof ArtisteDetailFragment){
-                    ArtisteDetailFragment artisteDetailFragment= (ArtisteDetailFragment) fragment;
-                    artisteDetailFragment.playEpisode(position);
+                if(fragment !=null && fragment instanceof PodcastPlayListFragment){
+                    PodcastPlayListFragment podcastPlayListFragment= (PodcastPlayListFragment) fragment;
+                    podcastPlayListFragment.playAudio(position);
                 }
+
             }
         });
 

@@ -1,9 +1,11 @@
 package com.sundroid.lystn.adapter;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,24 +22,22 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class HomeSquareTypeAdapter extends RecyclerView.Adapter<HomeSquareTypeAdapter.ViewHolder> {
+public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> {
 
     private List<HomeContentPOJO> items;
     Activity activity;
     Fragment fragment;
-    String type;
 
 
-    public HomeSquareTypeAdapter(Activity activity, Fragment fragment, List<HomeContentPOJO> items, String type) {
+    public QueueAdapter(Activity activity, Fragment fragment, List<HomeContentPOJO> items) {
         this.items = items;
         this.activity = activity;
         this.fragment = fragment;
-        this.type = type;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.inflate_home_square_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.inflate_queue_item, parent, false);
         return new ViewHolder(v);
     }
 
@@ -49,41 +49,29 @@ public class HomeSquareTypeAdapter extends RecyclerView.Adapter<HomeSquareTypeAd
                 .placeholder(R.drawable.ll_square)
                 .error(R.drawable.ll_square)
                 .dontAnimate()
-                .into(holder.iv_item);
+                .into(holder.iv_radio);
 
-        holder.tv_name.setText(items.get(position).getConName());
+        holder.tv_title.setText(items.get(position).getConName().trim());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (activity instanceof HomeActivity) {
                     HomeActivity homeActivity = (HomeActivity) activity;
-                    homeActivity.showPlayListFragment();
+                    homeActivity.playAudio(items, position, "radio", null);
                 }
             }
         });
 
-        holder.iv_item.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (type.equalsIgnoreCase("genre")) {
-                    if (activity instanceof HomeActivity) {
-                        HomeActivity homeActivity = (HomeActivity) activity;
-                        homeActivity.startGenreDetailFragment(items.get(position).getConId());
-                    }
-                } else if (type.equalsIgnoreCase("radio")) {
-                    if (activity instanceof HomeActivity) {
-                        HomeActivity homeActivity = (HomeActivity) activity;
-                        homeActivity.playAudio(items, position, "radio",null);
-                    }
-                } else if (type.equalsIgnoreCase("artiste")) {
-                    if (activity instanceof HomeActivity) {
-                        HomeActivity homeActivity = (HomeActivity) activity;
-                        homeActivity.showArtisteDetail(items.get(position).getConId());
-                    }
-                }
-            }
-        });
+        if (items.get(position).isPlaying()) {
+            holder.iv_playpause.setImageResource(R.drawable.ic_white_pause);
+            holder.tv_title.setTextColor(Color.parseColor("#FFA100"));
+        } else {
+            holder.iv_playpause.setImageResource(R.drawable.ic_white_play);
+            holder.tv_title.setTextColor(Color.parseColor("#000000"));
+        }
+
+//        holder.tv_description.setText(items.get(position).get);
 
         holder.itemView.setTag(items.get(position));
     }
@@ -96,10 +84,18 @@ public class HomeSquareTypeAdapter extends RecyclerView.Adapter<HomeSquareTypeAd
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.iv_item)
-        ImageView iv_item;
-        @BindView(R.id.tv_name)
-        TextView tv_name;
+        @BindView(R.id.iv_radio)
+        ImageView iv_radio;
+        @BindView(R.id.tv_title)
+        TextView tv_title;
+        @BindView(R.id.tv_description)
+        TextView tv_description;
+        @BindView(R.id.iv_download)
+        ImageView iv_download;
+        @BindView(R.id.frame_radio)
+        FrameLayout frame_radio;
+        @BindView(R.id.iv_playpause)
+        ImageView iv_playpause;
 
         public ViewHolder(View itemView) {
             super(itemView);

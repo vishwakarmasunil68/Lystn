@@ -1,16 +1,13 @@
 package com.sundroid.lystn.fragment.home;
 
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,7 +15,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.gson.Gson;
 import com.sundroid.lystn.R;
@@ -53,18 +49,22 @@ public class HomeFragment extends FragmentController {
     LinearLayout ll_home_content;
     @BindView(R.id.ll_home_default)
     LinearLayout ll_home_default;
-    @BindView(R.id.ll_small_player)
-    LinearLayout ll_small_player;
+    //    @BindView(R.id.ll_small_player)
+//    LinearLayout ll_small_player;
+//    @BindView(R.id.iv_player)
+//    ImageView iv_player;
+//    @BindView(R.id.tv_name)
+//    TextView tv_name;
+//    @BindView(R.id.iv_play)
+//    ImageView iv_play;
+//    @BindView(R.id.ll_play)
+//    LinearLayout ll_play;
     @BindView(R.id.rv_home)
     RecyclerView rv_home;
     @BindView(R.id.et_search)
     EditText et_search;
-    @BindView(R.id.tv_name)
-    TextView tv_name;
-    @BindView(R.id.iv_play)
-    ImageView iv_play;
-    @BindView(R.id.iv_player)
-    ImageView iv_player;
+
+
     @BindView(R.id.shimmer_text)
     ShimmerFrameLayout shimmerText;
 
@@ -81,15 +81,7 @@ public class HomeFragment extends FragmentController {
     public void setHomeContentPOJO(HomeContentPOJO homeContentPOJO) {
         this.homeContentPOJO = homeContentPOJO;
 
-        Glide.with(getActivity())
-                .load(homeContentPOJO.getImgIrl())
-                .placeholder(R.drawable.ll_square)
-                .error(R.drawable.ll_square)
-                .dontAnimate()
-                .into(iv_player);
 
-        tv_name.setText(homeContentPOJO.getConName());
-        ll_small_player.setVisibility(View.VISIBLE);
 
         shimmerText.startShimmer();
     }
@@ -118,62 +110,31 @@ public class HomeFragment extends FragmentController {
             }
         });
 
-        new CountDownTimer(3000, 1000) {
-
-            @Override
-            public void onTick(long millisUntilFinished) {
-
-            }
-
-            @Override
-            public void onFinish() {
-                shimmerText.stopShimmer();
-                ll_home_content.setVisibility(View.VISIBLE);
-                ll_home_default.setVisibility(View.GONE);
-            }
-        }.start();
+//        new CountDownTimer(3000, 1000) {
+//
+//            @Override
+//            public void onTick(long millisUntilFinished) {
+//
+//            }
+//
+//            @Override
+//            public void onFinish() {
+//                shimmerText.stopShimmer();
+//                ll_home_content.setVisibility(View.VISIBLE);
+//                ll_home_default.setVisibility(View.GONE);
+//            }
+//        }.start();
 
         attachHomeAdapter();
 
-        ll_small_player.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getActivity() instanceof HomeActivity) {
-                    HomeActivity homeActivity = (HomeActivity) getActivity();
-                    homeActivity.startMusicPlayerFragment();
-                }
-            }
-        });
 
-        iv_play.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                if(homeContentPOJO!=null){
-                if (getActivity() instanceof HomeActivity) {
-                    HomeActivity homeActivity = (HomeActivity) getActivity();
 
-                    tv_name.setText(homeContentPOJO.getConName());
-                    homeActivity.playPausePlayer();
-//                    if (homeActivity.isMediaPlayerRunning()) {
-//                        homeActivity.pauseMusic();
-//                    } else {
-//                        homeActivity.resumeMusic();
-//                    }
-                }
-//                }
-            }
-        });
 
         getHomeData();
     }
 
-    public void playPauseMusic(boolean is_playing) {
-        if (is_playing) {
-            iv_play.setImageResource(R.drawable.ic_pause);
-        } else {
-            iv_play.setImageResource(R.drawable.ic_play);
-        }
-    }
+
+
 
     public void getHomeData() {
         JSONObject jsonObject = new JSONObject();
@@ -192,7 +153,9 @@ public class HomeFragment extends FragmentController {
             @Override
             public void onGetMsg(String apicall, String response) {
                 dismissProgressBar();
-
+                shimmerText.stopShimmer();
+                ll_home_content.setVisibility(View.VISIBLE);
+                ll_home_default.setVisibility(View.GONE);
                 homePOJOS.clear();
 
                 try {
@@ -248,5 +211,6 @@ public class HomeFragment extends FragmentController {
         rv_home.setNestedScrollingEnabled(true);
         rv_home.setItemAnimator(new DefaultItemAnimator());
     }
+
 
 }

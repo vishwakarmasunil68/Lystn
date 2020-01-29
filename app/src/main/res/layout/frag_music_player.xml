@@ -1,328 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/coordinator"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F9F9F9"
     android:clickable="true"
+    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
+    <include layout="@layout/player_content" />
+
     <FrameLayout
+        android:id="@+id/frame_bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1">
-
-        <ImageView
-            android:id="@+id/iv_player_background"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitXY"/>
+        android:background="@android:color/transparent"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="0dp"
+        app:layout_behavior="@string/bottom_sheet_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:paddingTop="15dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="@drawable/ll_queue_background">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="44dp"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <LinearLayout
-                    android:id="@+id/ll_minimize"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="18dp"
+                    android:layout_marginLeft="16dp"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/ic_loops" />
 
-                    <ImageView
-                        android:layout_width="25dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:adjustViewBounds="true"
-                        android:src="@drawable/ic_down_black" />
-                </LinearLayout>
-
-                <com.sundroid.lystn.view.SFProBoldTV
+                <com.sundroid.lystn.view.RobotoMediumTV
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="#000000" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right|center"
                     android:layout_weight="1"
-                    android:gravity="right|center"
-                    android:paddingRight="10dp">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:adjustViewBounds="true"
-                        android:src="@drawable/ic_download" />
-
-                    <ImageView
-                        android:layout_width="25dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:adjustViewBounds="true"
-                        android:src="@drawable/ic_hor_nac"
-                        android:tint="#000000" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+                    android:layout_marginLeft="16dp"
+                    android:text="List loops"
+                    android:textSize="15sp" />
 
                 <ImageView
-                    android:id="@+id/iv_player"
-                    android:layout_width="300dp"
-                    android:layout_height="300dp"
-                    android:src="@drawable/ll_shadow" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_sorting" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <com.sundroid.lystn.view.RobotoMediumTV
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:layout_marginTop="50dp"
-                    android:layout_marginBottom="20dp"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <com.sundroid.lystn.view.RobotoBoldTV
-                        android:id="@+id/tv_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#000000"
-                        android:textSize="16sp"
-                        android:text="The 2019 MTV VMAs" />
-
-                    <com.sundroid.lystn.view.RobotoRegularTV
-                        android:id="@+id/tv_small_desc"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="2019 following | 9102 play"
-                        android:textColor="#40000000" />
-
-                </LinearLayout>
+                    android:text="Sorting"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="16dp"
+                    android:textSize="13sp"/>
 
             </LinearLayout>
+
+           <FrameLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content">
+
+               <androidx.recyclerview.widget.RecyclerView
+                   android:id="@+id/rv_queue_list"
+                   android:layout_width="match_parent"
+                   android:layout_height="400dp">
+
+               </androidx.recyclerview.widget.RecyclerView>
+
+               <FrameLayout
+                   android:id="@+id/frame_rv"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent">
+
+               </FrameLayout>
+
+           </FrameLayout>
 
         </LinearLayout>
 
     </FrameLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="15dp"
-            android:orientation="horizontal">
-
-            <com.sundroid.lystn.view.RobotoRegularTV
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="--:--" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
-
-                <SeekBar
-                    android:id="@+id/seekBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:progress="100"
-                    android:progressTint="@color/colorAccent"
-                    android:thumbTint="@color/md_white_1000" />
-
-            </LinearLayout>
-
-            <com.sundroid.lystn.view.RobotoRegularTV
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="--:--" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:weightSum="5">
-
-            <FrameLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:gravity="center">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_repeat_one" />
-
-                <com.sundroid.lystn.view.RobotoRegularTV
-                    android:id="@+id/tv_repeat_type"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="1"
-                    android:textSize="10sp"/>
-
-            </FrameLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:gravity="center">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_backward" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:gravity="center">
-
-                <ImageView
-                    android:id="@+id/iv_play"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_play" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:gravity="center">
-
-                <ImageView
-                    android:id="@+id/iv_next"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_next" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:gravity="center">
-
-                <ImageView
-                    android:id="@+id/iv_previous"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_queue" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="15dp"
-            android:orientation="vertical">
-
-            <com.sundroid.lystn.view.RobotoRegularTV
-                android:id="@+id/tv_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Here is the audio descriptive text, where the creator can show the descriptive summary of the work.Here is the audio descriptive text, where the creator can show the descriptive summary of the work.Here is the audio descriptive text, where the creator can show the descriptive summary of the work."
-                android:textSize="12sp" />
-
-        </LinearLayout>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:visibility="gone"
-            app:cardBackgroundColor="#FFFFFF"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="0dp"
-            app:cardUseCompatPadding="true">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:adjustViewBounds="true"
-                    android:src="@drawable/ic_playlist_logo" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:orientation="vertical">
-
-                    <com.sundroid.lystn.view.RobotoBoldTV
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="NPR" />
-
-                    <com.sundroid.lystn.view.RobotoRegularTV
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pop up culture and happy hour is a fun" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-
-    </LinearLayout>
-
-
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

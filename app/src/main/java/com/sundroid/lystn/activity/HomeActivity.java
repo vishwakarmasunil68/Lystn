@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.viewpager.widget.ViewPager;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.sundroid.lystn.R;
 import com.sundroid.lystn.adapter.ViewPagerAdapter;
@@ -42,6 +43,7 @@ import com.sundroid.lystn.fragment.login.LoginSelectLanguageFragment;
 import com.sundroid.lystn.fragment.playlist.PlayListFragment;
 import com.sundroid.lystn.fragmentcontroller.ActivityManager;
 import com.sundroid.lystn.pojo.artiste.ArtisteDetailPOJO;
+import com.sundroid.lystn.pojo.artiste.PodcastDetailPOJO;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
 import com.sundroid.lystn.pojo.home.HomePOJO;
 import com.sundroid.lystn.service.Constants;
@@ -271,6 +273,11 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
                 viewPager.setCurrentItem(0);
                 break;
             case R.id.ll_search:
+                if(fragmentList.size()>0){
+                    for(int i=0;i<fragmentList.size();i++){
+                        onBackPressed();
+                    }
+                }
                 viewPager.setCurrentItem(1);
                 break;
             case R.id.ll_update:
@@ -306,11 +313,6 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         startFragment(R.id.frame_main, new AllGenreFragment());
     }
 
-    public void startAllRadio() {
-        startFragment(R.id.frame_main, new AllRadioFragment());
-    }
-
-
     public void showUnLockPremiumFragment() {
         startFragment(R.id.frame_main, new MeSubscriptionFragment());
     }
@@ -323,10 +325,13 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         startFragment(R.id.frame_main, new LoginSelectLanguageFragment());
     }
 
+    MusicPlayerFragment musicPlayerFragment;
+    PodcastDetailPOJO podcastDetailPOJO;
+
     public void startMusicPlayerFragment() {
         if (homeContentPOJOS != null && homeContentPOJOS.size() > 0 && playingPosition != -1) {
             makeTransparentStatusBar();
-            startFragment(R.id.frame_main, new MusicPlayerFragment(homeContentPOJOS.get(playingPosition)));
+            startFragment(R.id.frame_home_activity, musicPlayerFragment = new MusicPlayerFragment(homeContentPOJOS,playingPosition, podcastDetailPOJO));
         }
     }
 
@@ -346,6 +351,11 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         startFragment(R.id.frame_main, new HomeAllContentFragment(homePOJO));
     }
 
+    public void showAllRadioContentFragment(HomePOJO homePOJO) {
+        makeTransparentStatusBar();
+        startFragment(R.id.frame_main, new AllRadioFragment(homePOJO));
+    }
+
 
     public void nextSong() {
         if (homeContentPOJOS != null && homeContentPOJOS.size() > 0 && playingPosition != -1) {
@@ -353,7 +363,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
                 playingPosition = playingPosition + 1;
                 MusicPlayerFragment musicPlayerFragment = getMusicPlayerFragment();
                 if (musicPlayerFragment != null) {
-                    musicPlayerFragment.setHomeContentPOJO(homeContentPOJOS.get(playingPosition));
+                    musicPlayerFragment.setHomeContentPOJO(playingPosition);
                     startPlayer(homeContentPOJOS.get(playingPosition));
                 }
             }
@@ -368,19 +378,23 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
                 playingPosition = playingPosition - 1;
                 MusicPlayerFragment musicPlayerFragment = getMusicPlayerFragment();
                 if (musicPlayerFragment != null) {
-                    musicPlayerFragment.setHomeContentPOJO(homeContentPOJOS.get(playingPosition));
+                    musicPlayerFragment.setHomeContentPOJO(playingPosition);
                     startPlayer(homeContentPOJOS.get(playingPosition));
                 }
             }
         }
     }
 
-    public void playAudio(List<HomeContentPOJO> homeContentPOJOS, int position, String type) {
+    public void playAudio(List<HomeContentPOJO> homeContentPOJOS, int position, String type, PodcastDetailPOJO podcastDetailPOJO) {
         Pref.SetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, type);
         this.media_type = type;
         this.homeContentPOJOS.clear();
         this.homeContentPOJOS.addAll(homeContentPOJOS);
         this.playingPosition = position;
+        this.podcastDetailPOJO = podcastDetailPOJO;
+        if (podcastDetailPOJO != null) {
+            Pref.SetStringPref(getApplicationContext(), StringUtils.NOTIFICAION_ALBUM_NAME, podcastDetailPOJO.getTitle());
+        }
         startMusicPlayerFragment();
         startPlayer(this.homeContentPOJOS.get(playingPosition));
     }
@@ -415,7 +429,10 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
             musicPlayerFragment.setPlayImage(is_playing);
         }
         homeFragment.setHomeContentPOJO(homeContentPOJOS.get(playingPosition));
-        homeFragment.playPauseMusic(is_playing);
+//        setSmallPlayerHomeContent(homeContentPOJOS.get(playingPosition));
+        setSmallPlayerListeners(homeContentPOJOS.get(playingPosition));
+        playPauseMusic(is_playing);
+//        homeFragment.playPauseMusic(is_playing);
     }
 
     public void playSongMessageToService(HomeContentPOJO homeContentPOJO) {
@@ -445,7 +462,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         public void onReceive(Context context, Intent intent) {
             try {
                 String type = intent.getStringExtra("type");
-                Log.d(TagUtils.getTag(), "type:-" + type);
+//                Log.d(TagUtils.getTag(), "type:-" + type);
                 if (type.equalsIgnoreCase("dismiss_progress")) {
                     dismissProgressBar();
                 } else if (type.equalsIgnoreCase(StringUtils.MUSIC_PLAYING_STATUS)) {
@@ -455,6 +472,14 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
                     nextSong();
                 } else if (type.equalsIgnoreCase(StringUtils.PREVIOUS_SONG)) {
                     previousSong();
+                } else if (type.equalsIgnoreCase(StringUtils.MEDIA_TIMINGS)) {
+                    if (musicPlayerFragment != null) {
+                        musicPlayerFragment.updateTimings(intent.getIntExtra(StringUtils.CURRENT_MEDIA_TIME, 0), intent.getIntExtra(StringUtils.MEDIA_DURATION, 0));
+                    }
+                    updateTimings(intent.getIntExtra(StringUtils.CURRENT_MEDIA_TIME, 0), intent.getIntExtra(StringUtils.MEDIA_DURATION, 0));
+//                    if (homeFragment != null) {
+//                        homeFragment.updateTimings(intent.getIntExtra(StringUtils.CURRENT_MEDIA_TIME, 0), intent.getIntExtra(StringUtils.MEDIA_DURATION, 0));
+//                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -500,6 +525,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
     }
 
     public void makeTransparentStatusBar() {
+        Log.d(TagUtils.getTag(),"transparent background");
         if (Build.VERSION.SDK_INT >= 19 && Build.VERSION.SDK_INT < 21) {
             setWindowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, true);
         }
@@ -728,8 +754,119 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         stopService(new Intent(HomeActivity.this, MediaService.class));
     }
 
-    public void playEpisode(List<HomeContentPOJO> homeContentPOJOS,int index) {
-        playAudio(homeContentPOJOS, index, "genre");
+    @Override
+    public void onBackPressed() {
+        if(fragmentList.size()==0){
+            if(viewPager.getCurrentItem()==0) {
+                super.onBackPressed();
+            }else{
+                viewPager.setCurrentItem(0);
+            }
+        }else{
+            super.onBackPressed();
+        }
     }
 
+    //    public void playEpisode(List<HomeContentPOJO> homeContentPOJOS, int index) {
+//        playAudio(homeContentPOJOS, index, "genre");
+//    }
+
+    public void seekMediaPlayer(int progress) {
+        Intent intent = new Intent(StringUtils.UPDATE_SERVICE);
+        intent.putExtra("type", StringUtils.SEEK_PLAYER);
+        intent.putExtra(StringUtils.SEEK_PROGRESS, progress);
+        sendBroadcast(intent);
+    }
+
+    @BindView(R.id.ll_small_player)
+    LinearLayout ll_small_player;
+    @BindView(R.id.iv_player)
+    ImageView iv_player;
+    @BindView(R.id.tv_name)
+    TextView tv_name;
+    @BindView(R.id.iv_play)
+    ImageView iv_play;
+    @BindView(R.id.ll_play)
+    LinearLayout ll_play;
+    @BindView(R.id.tv_timings)
+    TextView tv_timings;
+
+    public void setSmallPlayerListeners(HomeContentPOJO homeContentPOJO) {
+
+        Glide.with(this)
+                .load(homeContentPOJO.getImgIrl())
+                .placeholder(R.drawable.ll_square)
+                .error(R.drawable.ll_square)
+                .dontAnimate()
+                .into(iv_player);
+
+        if (Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").equalsIgnoreCase("radio")) {
+            tv_timings.setVisibility(View.GONE);
+        } else {
+            tv_timings.setVisibility(View.VISIBLE);
+        }
+
+        tv_name.setText(homeContentPOJO.getConName());
+
+        ll_small_player.setVisibility(View.VISIBLE);
+
+        ll_small_player.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startMusicPlayerFragment();
+            }
+        });
+
+        iv_play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    tv_name.setText(homeContentPOJO.getConName());
+                    playPausePlayer();
+            }
+        });
+
+        ll_play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iv_play.callOnClick();
+            }
+        });
+
+    }
+
+    public void playPauseMusic(boolean is_playing) {
+        if (is_playing) {
+            iv_play.setImageResource(R.drawable.ic_mini_mp_pause);
+        } else {
+            iv_play.setImageResource(R.drawable.ic_mini_mp_play);
+        }
+    }
+
+    public void updateTimings(int current_time, int media_duration) {
+        tv_timings.setText(getMinSec(current_time) + " / " + getMinSec(media_duration));
+    }
+
+    public String getMinSec(int current_time) {
+        int total_seconds = (int) (current_time / 1000);
+        int minutes = total_seconds / 60;
+        int seconds = total_seconds % 60;
+
+        String min = "";
+
+        if (minutes < 10) {
+            min = "0" + String.valueOf(minutes);
+        } else {
+            min = String.valueOf(minutes);
+        }
+
+        String sec = "";
+
+        if (seconds < 10) {
+            sec = "0" + String.valueOf(seconds);
+        } else {
+            sec = String.valueOf(seconds);
+        }
+
+        return min + " : " + sec;
+    }
 }

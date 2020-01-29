@@ -1,6 +1,7 @@
 package com.sundroid.lystn.adapter;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.sundroid.lystn.R;
 import com.sundroid.lystn.activity.HomeActivity;
-import com.sundroid.lystn.fragment.home.MusicPlayerFragment;
 import com.sundroid.lystn.fragment.playlist.PlayListFragment;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
 
@@ -51,24 +51,31 @@ public class HomePillsAdapter extends RecyclerView.Adapter<HomePillsAdapter.View
         switch (position%6){
             case 0:
                 holder.ll_pill.setBackgroundResource(R.drawable.ll_home_category_1);
+                holder.tv_cat.setTextColor(Color.parseColor("#FF4488"));
                 break;
             case 1:
                 holder.ll_pill.setBackgroundResource(R.drawable.ll_home_category_2);
+                holder.tv_cat.setTextColor(Color.parseColor("#3061FF"));
                 break;
             case 2:
                 holder.ll_pill.setBackgroundResource(R.drawable.ll_home_category_3);
+                holder.tv_cat.setTextColor(Color.parseColor("#494949"));
                 break;
             case 3:
                 holder.ll_pill.setBackgroundResource(R.drawable.ll_home_category_4);
+                holder.tv_cat.setTextColor(Color.parseColor("#AD592C"));
                 break;
             case 4:
                 holder.ll_pill.setBackgroundResource(R.drawable.ll_home_category_5);
+                holder.tv_cat.setTextColor(Color.parseColor("#1F3487"));
                 break;
             case 5:
                 holder.ll_pill.setBackgroundResource(R.drawable.ll_home_category_6);
+                holder.tv_cat.setTextColor(Color.parseColor("#18A5B8"));
                 break;
             default:
                 holder.ll_pill.setBackgroundResource(R.drawable.ll_home_category_1);
+                holder.tv_cat.setTextColor(Color.parseColor("#FF4488"));
                 break;
         }
 
@@ -92,12 +99,12 @@ public class HomePillsAdapter extends RecyclerView.Adapter<HomePillsAdapter.View
                 }else if(type.equalsIgnoreCase("radio")){
                     if(activity instanceof HomeActivity){
                         HomeActivity homeActivity= (HomeActivity) activity;
-                        homeActivity.playAudio(items,position,"radio");
+                        homeActivity.playAudio(items,position,"radio",null);
                     }
                 }else if(type.equalsIgnoreCase("artiste")){
                     if(activity instanceof HomeActivity){
-                        HomeActivity homeActivity= (HomeActivity) activity;
-                        homeActivity.startFragment(R.id.frame_main,new MusicPlayerFragment(items.get(position)));
+//                        HomeActivity homeActivity= (HomeActivity) activity;
+//                        homeActivity.startFragment(R.id.frame_main,new MusicPlayerFragment(items.get(position)));
                     }
                 }
             }

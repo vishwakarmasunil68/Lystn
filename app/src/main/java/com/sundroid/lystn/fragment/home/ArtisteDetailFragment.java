@@ -19,6 +19,7 @@ import com.sundroid.lystn.R;
 import com.sundroid.lystn.activity.HomeActivity;
 import com.sundroid.lystn.adapter.PodcastEpisodeAdapter;
 import com.sundroid.lystn.fragmentcontroller.FragmentController;
+import com.sundroid.lystn.pojo.artiste.PodcastDetailPOJO;
 import com.sundroid.lystn.pojo.artiste.PodcastEpisodeDetailsPOJO;
 import com.sundroid.lystn.pojo.artiste.PodcastPOJO;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
@@ -50,6 +51,7 @@ public class ArtisteDetailFragment extends FragmentController {
     @BindView(R.id.iv_back)
     ImageView iv_back;
 
+    PodcastDetailPOJO podcastDetailPOJO;
 
     String conId;
 
@@ -122,6 +124,7 @@ public class ArtisteDetailFragment extends FragmentController {
 
                         PodcastPOJO podcastPOJO=new Gson().fromJson(responseObject.optJSONObject("podcast").toString(),PodcastPOJO.class);
 
+                        podcastDetailPOJO=podcastPOJO.getPodcastDetailPOJO();
 
                         tv_podcast_name.setText(podcastPOJO.getPodcastDetailPOJO().getTitle());
                         tv_podcast_description.setText(podcastPOJO.getPodcastDetailPOJO().getDescription());
@@ -169,7 +172,7 @@ public class ArtisteDetailFragment extends FragmentController {
     public void playEpisode(int index){
         if(getActivity() instanceof HomeActivity){
             HomeActivity homeActivity= (HomeActivity) getActivity();
-            homeActivity.playAudio(homeContentPOJOS,index,"artiste");
+            homeActivity.playAudio(homeContentPOJOS,index,"artiste",podcastDetailPOJO);
         }
     }
 

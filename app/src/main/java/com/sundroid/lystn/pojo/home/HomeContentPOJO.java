@@ -20,6 +20,7 @@ public class HomeContentPOJO implements Serializable {
     private String cotDeepLink;
     private String description;
     private String subtitle;
+    private boolean playing;
 
     public String getConId() {
         return conId;
@@ -77,5 +78,13 @@ public class HomeContentPOJO implements Serializable {
 
     public void setSubtitle(String subtitle) {
         this.subtitle = subtitle;
+    }
+
+    public boolean isPlaying() {
+        return playing;
+    }
+
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
     }
 }

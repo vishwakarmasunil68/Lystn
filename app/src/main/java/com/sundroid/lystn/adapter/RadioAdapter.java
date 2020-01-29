@@ -49,14 +49,14 @@ public class RadioAdapter extends RecyclerView.Adapter<RadioAdapter.ViewHolder> 
                 .dontAnimate()
                 .into(holder.iv_radio);
 
-        holder.tv_title.setText(items.get(position).getConName());
+        holder.tv_title.setText(items.get(position).getConName().trim());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(activity instanceof HomeActivity){
                     HomeActivity homeActivity= (HomeActivity) activity;
-                    homeActivity.showPlayListFragment();
+                    homeActivity.playAudio(items,position,"radio",null);
                 }
             }
         });

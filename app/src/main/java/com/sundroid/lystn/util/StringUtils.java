@@ -30,12 +30,17 @@ public class StringUtils {
     public static String PLAY_SONG="PLAY_SONG";
     public static String COMMAND="COMMAND";
     public static String AUDIO_DATA="AUDIO_DATA";
+    public static String SEEK_PROGRESS="SEEK_PROGRESS";
+    public static String SEEK_PLAYER="SEEK_PLAYER";
     public static String MEDIA_TYPE="MEDIA_TYPE";
     public static String PLAY_PAUSE_MEDIA="PLAY_PAUSE_MEDIA";
     public static String CHECK_PLAYER="CHECK_PLAYER";
     public static String PLAY_COMPLETED="PLAY_COMPLETED";
     public static String MUSIC_PLAYING_STATUS="MUSIC_PLAYING_STATUS";
     public static String NEXT_SONG="NEXT_SONG";
-    public static String MEDIA_TIMINGS="NEXT_SONG";
+    public static String MEDIA_TIMINGS="MEDIA_TIMINGS";
+    public static String MEDIA_DURATION="MEDIA_DURATION";
+    public static String CURRENT_MEDIA_TIME="CURRENT_MEDIA_TIME";
     public static String PREVIOUS_SONG="PREVIOUS_SONG";
+    public static String NOTIFICAION_ALBUM_NAME="NOTIFICAION_ALBUM_NAME";
 }

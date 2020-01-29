@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.sundroid.lystn.R;
+import com.sundroid.lystn.activity.HomeActivity;
 import com.sundroid.lystn.adapter.RadioAdapter;
 import com.sundroid.lystn.fragmentcontroller.FragmentController;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
@@ -41,6 +42,16 @@ public class AllRadioFragment extends FragmentController {
     ImageView iv_back;
     @BindView(R.id.rv_radio)
     RecyclerView rv_radio;
+    @BindView(R.id.iv_radio_play_all)
+    ImageView iv_radio_play_all;
+
+    HomePOJO homePOJO;
+
+    List<HomeContentPOJO> homeContentPOJOS = new ArrayList<>();
+
+    public AllRadioFragment(HomePOJO homePOJO){
+        this.homePOJO=homePOJO;
+    }
 
     @Nullable
     @Override
@@ -61,22 +72,89 @@ public class AllRadioFragment extends FragmentController {
             }
         });
 
-
+        iv_radio_play_all.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(getActivity() instanceof HomeActivity){
+                    HomeActivity homeActivity= (HomeActivity) getActivity();
+                    homeActivity.playAudio(homeContentPOJOS,0,"radio",null);
+                }
+            }
+        });
 
         attachArtistAdapter();
         getRadioData();
 
     }
 
+    @Override
+    public void onDestroy() {
+        if (getActivity() instanceof HomeActivity) {
+            HomeActivity homeActivity = (HomeActivity) getActivity();
+            homeActivity.onMusicPlayerClosed();
+        }
+        super.onDestroy();
+    }
+
     public void getRadioData() {
+//        JSONObject jsonObject = new JSONObject();
+//
+//        showProgressBar();
+//
+//        try {
+//            jsonObject.put("userId", Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.USER_ID, ""));
+//            jsonObject.put("deviceId", Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.DEVICE_ID, ""));
+//            jsonObject.put("langCode", "en");
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//
+//        new ApiCallBase(getActivity(), new WebServicesCallBack() {
+//            @Override
+//            public void onGetMsg(String apicall, String response) {
+//                dismissProgressBar();
+//                radioPojos.clear();
+//                try {
+//                    String object = new String(response);
+//                    JSONObject jsonObject = new JSONObject(object);
+//                    JSONObject responseObject = jsonObject.optJSONObject("response");
+//                    if (responseObject.optBoolean("status")) {
+////                        if(getActivity() instanceof LoginActivity){
+//
+//                        HomePOJO homePOJO=new Gson().fromJson(responseObject.optJSONObject("data").toString(),HomePOJO.class);
+//                        for(HomeContentPOJO homeContentPOJO:homePOJO.getHomeContentPOJOS()){
+//                            radioPojos.add(homeContentPOJO);
+//                        }
+//
+//                        queueAdapter.notifyDataSetChanged();
+//
+//                    } else {
+//                        ToastClass.showShortToast(getActivity(), "Something went wrong");
+//                    }
+//                    Log.d(TagUtils.getTag(), jsonObject.toString());
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onErrorMsg(String status_code, String response) {
+//                dismissProgressBar();
+//            }
+//        }, "GET_HOME").makeApiCall(WebServicesUrls.GET_RADIO_BUCKET, jsonObject);
+
         JSONObject jsonObject = new JSONObject();
 
         showProgressBar();
 
         try {
             jsonObject.put("userId", Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.USER_ID, ""));
+            jsonObject.put("isdCode", "91");
+            jsonObject.put("mobileNo", "9873738969");
             jsonObject.put("deviceId", Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.DEVICE_ID, ""));
+            jsonObject.put("conId", "1");
             jsonObject.put("langCode", "en");
+            jsonObject.put("bkId", homePOJO.getBkId());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -85,7 +163,7 @@ public class AllRadioFragment extends FragmentController {
             @Override
             public void onGetMsg(String apicall, String response) {
                 dismissProgressBar();
-                radioPojos.clear();
+                homeContentPOJOS.clear();
                 try {
                     String object = new String(response);
                     JSONObject jsonObject = new JSONObject(object);
@@ -93,9 +171,9 @@ public class AllRadioFragment extends FragmentController {
                     if (responseObject.optBoolean("status")) {
 //                        if(getActivity() instanceof LoginActivity){
 
-                        HomePOJO homePOJO=new Gson().fromJson(responseObject.optJSONObject("data").toString(),HomePOJO.class);
-                        for(HomeContentPOJO homeContentPOJO:homePOJO.getHomeContentPOJOS()){
-                            radioPojos.add(homeContentPOJO);
+                        HomePOJO homePOJO = new Gson().fromJson(responseObject.optJSONObject("data").toString(), HomePOJO.class);
+                        for (HomeContentPOJO homeContentPOJO : homePOJO.getHomeContentPOJOS()) {
+                            homeContentPOJOS.add(homeContentPOJO);
                         }
 
                         radioAdapter.notifyDataSetChanged();
@@ -113,17 +191,16 @@ public class AllRadioFragment extends FragmentController {
             public void onErrorMsg(String status_code, String response) {
                 dismissProgressBar();
             }
-        }, "GET_HOME").makeApiCall(WebServicesUrls.GET_RADIO_BUCKET, jsonObject);
+        }, "GET_HOME_CONTENT").makeApiCall(WebServicesUrls.GET_SEE_ALL_BUCKET, jsonObject);
     }
 
     RadioAdapter radioAdapter;
-    List<HomeContentPOJO> radioPojos = new ArrayList<>();
 
     public void attachArtistAdapter() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rv_radio.setHasFixedSize(true);
         rv_radio.setLayoutManager(linearLayoutManager);
-        radioAdapter = new RadioAdapter(getActivity(), this, radioPojos);
+        radioAdapter = new RadioAdapter(getActivity(), this, homeContentPOJOS);
         rv_radio.setAdapter(radioAdapter);
         rv_radio.setNestedScrollingEnabled(false);
         rv_radio.setItemAnimator(new DefaultItemAnimator());
