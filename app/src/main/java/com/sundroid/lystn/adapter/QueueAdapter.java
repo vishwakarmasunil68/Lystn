@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.sundroid.lystn.R;
-import com.sundroid.lystn.activity.HomeActivity;
+import com.sundroid.lystn.fragment.home.MusicPlayerFragment;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
 
 import java.util.List;
@@ -56,9 +56,13 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (activity instanceof HomeActivity) {
-                    HomeActivity homeActivity = (HomeActivity) activity;
-                    homeActivity.playAudio(items, position, "radio", null);
+//                if (activity instanceof HomeActivity) {
+//                    HomeActivity homeActivity = (HomeActivity) activity;
+//                    homeActivity.playQueueSelectedSong(position);
+//                }
+                if (fragment != null && fragment instanceof MusicPlayerFragment) {
+                    MusicPlayerFragment musicPlayerFragment = (MusicPlayerFragment) fragment;
+                    musicPlayerFragment.playQueueSelectedSong(position);
                 }
             }
         });

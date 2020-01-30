@@ -97,13 +97,17 @@ public class MusicPlayerFragment extends FragmentController {
     FrameLayout frame_bottom_sheet;
     @BindView(R.id.frame_rv)
     FrameLayout frame_rv;
+    @BindView(R.id.frame_podcast)
+    FrameLayout frame_podcast;
+    @BindView(R.id.iv_seek_forward)
+    ImageView iv_seek_forward;
     BottomSheetBehavior bottomSheetBehavior;
 
     PodcastDetailPOJO podcastDetailPOJO;
     List<HomeContentPOJO> homeContentPOJOS;
     int position;
 
-    boolean onRVTouch=false;
+    boolean onRVTouch = false;
 
     public MusicPlayerFragment(List<HomeContentPOJO> homeContentPOJOS, int position, PodcastDetailPOJO podcastDetailPOJO) {
         this.homeContentPOJOS = homeContentPOJOS;
@@ -133,7 +137,7 @@ public class MusicPlayerFragment extends FragmentController {
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View view, int i) {
-                if(onRVTouch){
+                if (onRVTouch) {
                     if (i == BottomSheetBehavior.STATE_DRAGGING) {
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                     }
@@ -192,6 +196,17 @@ public class MusicPlayerFragment extends FragmentController {
                         HomeActivity homeActivity = (HomeActivity) getActivity();
                         homeActivity.nextSong();
                     }
+                }
+            }
+        });
+
+        iv_seek_forward.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TagUtils.getTag(), "seeekbar progress:-" + seekBar.getProgress());
+                if (getActivity() instanceof HomeActivity) {
+                    HomeActivity homeActivity = (HomeActivity) getActivity();
+                    homeActivity.seekMediaPlayer(seekBar.getProgress() + 15000);
                 }
             }
         });
@@ -357,7 +372,7 @@ public class MusicPlayerFragment extends FragmentController {
                 .dontAnimate()
                 .into(iv_player);
 
-        for(HomeContentPOJO homeContentPOJO:homeContentPOJOS){
+        for (HomeContentPOJO homeContentPOJO : homeContentPOJOS) {
             homeContentPOJO.setPlaying(false);
         }
 
@@ -394,7 +409,7 @@ public class MusicPlayerFragment extends FragmentController {
             homeActivity.checkPlayerRunning();
         }
         if (podcastDetailPOJO != null) {
-            cv_podcast.setVisibility(View.VISIBLE);
+            frame_podcast.setVisibility(View.VISIBLE);
             Glide.with(getActivity())
                     .load(podcastDetailPOJO.getImgLocalUri())
                     .placeholder(R.drawable.ll_square)
@@ -405,7 +420,7 @@ public class MusicPlayerFragment extends FragmentController {
             tv_podcast_name.setText(podcastDetailPOJO.getTitle());
             tv_podcast_copy_right.setText(podcastDetailPOJO.getCopyright());
         } else {
-            cv_podcast.setVisibility(View.GONE);
+            frame_podcast.setVisibility(View.INVISIBLE);
         }
         queueAdapter.notifyDataSetChanged();
 
@@ -420,12 +435,12 @@ public class MusicPlayerFragment extends FragmentController {
         frame_rv.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TagUtils.getTag(),"frame touch");
+                Log.d(TagUtils.getTag(), "frame touch");
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                onRVTouch=true;
-                switch(event.getAction()) {
+                onRVTouch = true;
+                switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        Log.d(TagUtils.getTag(),"Action Down");
+                        Log.d(TagUtils.getTag(), "Action Down");
                         // touch down code
 //                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                         break;
@@ -436,8 +451,8 @@ public class MusicPlayerFragment extends FragmentController {
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        Log.d(TagUtils.getTag(),"Action UP");
-                        onRVTouch=false;
+                        Log.d(TagUtils.getTag(), "Action UP");
+                        onRVTouch = false;
                         // touch up code
                         break;
                 }
@@ -448,12 +463,12 @@ public class MusicPlayerFragment extends FragmentController {
         rv_queue_list.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TagUtils.getTag(),"rv_queue touch");
+                Log.d(TagUtils.getTag(), "rv_queue touch");
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                onRVTouch=true;
-                switch(event.getAction()) {
+                onRVTouch = true;
+                switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        Log.d(TagUtils.getTag(),"Action Down");
+                        Log.d(TagUtils.getTag(), "Action Down");
                         // touch down code
 //                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                         break;
@@ -464,8 +479,8 @@ public class MusicPlayerFragment extends FragmentController {
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        Log.d(TagUtils.getTag(),"Action UP");
-                        onRVTouch=false;
+                        Log.d(TagUtils.getTag(), "Action UP");
+                        onRVTouch = false;
                         // touch up code
                         break;
                 }
@@ -526,5 +541,16 @@ public class MusicPlayerFragment extends FragmentController {
         rv_queue_list.setAdapter(queueAdapter);
         rv_queue_list.setNestedScrollingEnabled(false);
         rv_queue_list.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    public void playQueueSelectedSong(int position) {
+        if (getActivity() instanceof HomeActivity) {
+            for(HomeContentPOJO homeContentPOJO:homeContentPOJOS){
+                homeContentPOJO.setPlaying(false);
+            }
+            this.homeContentPOJOS.get(position).setPlaying(true);
+            HomeActivity homeActivity = (HomeActivity) getActivity();
+            homeActivity.playQueueSelectedSong(position);
+        }
     }
 }

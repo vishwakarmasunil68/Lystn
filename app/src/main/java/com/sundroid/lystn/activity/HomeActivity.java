@@ -370,6 +370,19 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         }
     }
 
+    public void playQueueSelectedSong(int position) {
+        if (homeContentPOJOS != null && homeContentPOJOS.size() > 0 && playingPosition != -1) {
+//            if ((homeContentPOJOS.size() - 1) > position) {
+            playingPosition = position;
+            MusicPlayerFragment musicPlayerFragment = getMusicPlayerFragment();
+            if (musicPlayerFragment != null) {
+                musicPlayerFragment.setHomeContentPOJO(playingPosition);
+                startPlayer(homeContentPOJOS.get(playingPosition));
+//                }
+            }
+        }
+    }
+
 
     public void previousSong() {
         Log.d(TagUtils.getTag(), "previous song");
@@ -386,6 +399,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
     }
 
     public void playAudio(List<HomeContentPOJO> homeContentPOJOS, int position, String type, PodcastDetailPOJO podcastDetailPOJO) {
+        ll_small_player.setVisibility(View.VISIBLE);
         Pref.SetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, type);
         this.media_type = type;
         this.homeContentPOJOS.clear();
@@ -414,15 +428,15 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
 
     public void setMusicPlayerFragmentPlayImage(boolean is_playing) {
 
-        if (fragmentList != null && fragmentList.size() > 0) {
-            for (int i = 0; i < fragmentList.size(); i++) {
-                Log.d(TagUtils.getTag(), "fragment:-" + fragmentList.get(i).getClass().getName());
-                if (fragmentList.get(i) instanceof MusicPlayerFragment) {
-                    MusicPlayerFragment musicPlayerFragment = (MusicPlayerFragment) fragmentList.get(i);
-
-                }
-            }
-        }
+//        if (fragmentList != null && fragmentList.size() > 0) {
+//            for (int i = 0; i < fragmentList.size(); i++) {
+//                Log.d(TagUtils.getTag(), "fragment:-" + fragmentList.get(i).getClass().getName());
+//                if (fragmentList.get(i) instanceof MusicPlayerFragment) {
+//                    MusicPlayerFragment musicPlayerFragment = (MusicPlayerFragment) fragmentList.get(i);
+//
+//                }
+//            }
+//        }
 
         MusicPlayerFragment musicPlayerFragment = getMusicPlayerFragment();
         if (musicPlayerFragment != null) {
@@ -480,6 +494,8 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
 //                    if (homeFragment != null) {
 //                        homeFragment.updateTimings(intent.getIntExtra(StringUtils.CURRENT_MEDIA_TIME, 0), intent.getIntExtra(StringUtils.MEDIA_DURATION, 0));
 //                    }
+                }else if(type.equalsIgnoreCase(StringUtils.PLAY_COMPLETED)){
+                    nextSong();
                 }
             } catch (Exception e) {
                 e.printStackTrace();

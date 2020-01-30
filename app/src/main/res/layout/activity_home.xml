@@ -44,7 +44,7 @@
             android:background="#F9F9F9"
             android:gravity="center_vertical"
             android:orientation="vertical"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <View
                 android:layout_width="match_parent"

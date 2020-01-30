@@ -31,8 +31,6 @@ import com.sundroid.lystn.util.Pref;
 import com.sundroid.lystn.util.StringUtils;
 import com.sundroid.lystn.util.TagUtils;
 
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.net.URL;
 
@@ -74,7 +72,9 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
 
             @Override
             public void onTick(long millisUntilFinished) {
-                updateMediaTiming();
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    updateMediaTiming();
+                }
             }
 
             @Override
@@ -93,13 +93,13 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
 
     public void sendMessageToHome(String command, Object object) {
         try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put(StringUtils.COMMAND, command);
-            if (object != null) {
-                jsonObject.put(StringUtils.AUDIO_DATA, new Gson().toJson(object));
-            }
+//            JSONObject jsonObject = new JSONObject();
+//            jsonObject.put(StringUtils.COMMAND, command);
+//            if (object != null) {
+//                jsonObject.put(StringUtils.AUDIO_DATA, new Gson().toJson(object));
+//            }
             Intent intent = new Intent(StringUtils.UPDATE_HOME_ACTIVITY);
-            intent.putExtra("message", jsonObject.toString());
+            intent.putExtra("type", command);
             sendBroadcast(intent);
         } catch (Exception e) {
             e.printStackTrace();
@@ -516,10 +516,10 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
                     Log.d(TagUtils.getTag(), "setting notification metadata");
                     mBuilder.setLargeIcon(theBitmap);
                     mBuilder.setContentText(homeContentPOJO.getConName());
-                    if(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").equalsIgnoreCase("radio")){
+                    if (Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").equalsIgnoreCase("radio")) {
                         mBuilder.setContentTitle(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, ""));
-                    }else{
-                        mBuilder.setContentTitle(Pref.GetStringPref(getApplicationContext(),StringUtils.NOTIFICAION_ALBUM_NAME,""));
+                    } else {
+                        mBuilder.setContentTitle(Pref.GetStringPref(getApplicationContext(), StringUtils.NOTIFICAION_ALBUM_NAME, ""));
                     }
 
                     mBuilder.setContentInfo(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, ""));
