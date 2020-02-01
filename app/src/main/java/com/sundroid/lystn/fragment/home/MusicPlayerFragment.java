@@ -101,6 +101,8 @@ public class MusicPlayerFragment extends FragmentController {
     FrameLayout frame_podcast;
     @BindView(R.id.iv_seek_forward)
     ImageView iv_seek_forward;
+    @BindView(R.id.layout_content)
+    View layout_content;
     BottomSheetBehavior bottomSheetBehavior;
 
     PodcastDetailPOJO podcastDetailPOJO;
@@ -128,6 +130,12 @@ public class MusicPlayerFragment extends FragmentController {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        layout_content.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
 
         attachQueueAdapter();
 //        this.homeContentPOJOS.clear();
@@ -390,6 +398,8 @@ public class MusicPlayerFragment extends FragmentController {
 
         if (homeContentPOJOS.get(position).getDescription() != null && !(homeContentPOJOS.get(position).getDescription().equalsIgnoreCase(""))) {
             tv_description.setText(homeContentPOJOS.get(position).getDescription());
+        } else {
+            tv_description.setText("");
         }
 
         if (Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.MEDIA_TYPE, "").equalsIgnoreCase("radio")) {
@@ -501,8 +511,9 @@ public class MusicPlayerFragment extends FragmentController {
     public void updateTimings(int current_time, int media_duration) {
         seekBar.setMax(media_duration);
         seekBar.setProgress(current_time);
-
-        tv_current_time.setText(getMinSec(current_time));
+        String minSec = getMinSec(current_time);
+        Log.d(TagUtils.getTag(),"min sec:-"+minSec);
+        tv_current_time.setText(minSec);
         tv_total_duration.setText(getMinSec(media_duration));
     }
 
@@ -545,7 +556,7 @@ public class MusicPlayerFragment extends FragmentController {
 
     public void playQueueSelectedSong(int position) {
         if (getActivity() instanceof HomeActivity) {
-            for(HomeContentPOJO homeContentPOJO:homeContentPOJOS){
+            for (HomeContentPOJO homeContentPOJO : homeContentPOJOS) {
                 homeContentPOJO.setPlaying(false);
             }
             this.homeContentPOJOS.get(position).setPlaying(true);

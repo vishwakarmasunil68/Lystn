@@ -43,4 +43,5 @@ public class StringUtils {
     public static String CURRENT_MEDIA_TIME="CURRENT_MEDIA_TIME";
     public static String PREVIOUS_SONG="PREVIOUS_SONG";
     public static String NOTIFICAION_ALBUM_NAME="NOTIFICAION_ALBUM_NAME";
+    public static String DISMISS_PROGRESS_BAR="DISMISS_PROGRESS_BAR";
 }

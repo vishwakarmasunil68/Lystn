@@ -59,6 +59,7 @@ public class PodcastEpisodeDetailsPOJO {
     @SerializedName("added_on")
     @Expose
     private String addedOn;
+    private boolean downloaded;
 
     public String getEpisodeId() {
         return episodeId;
@@ -202,5 +203,13 @@ public class PodcastEpisodeDetailsPOJO {
 
     public void setAddedOn(String addedOn) {
         this.addedOn = addedOn;
+    }
+
+    public boolean isDownloaded() {
+        return downloaded;
+    }
+
+    public void setDownloaded(boolean downloaded) {
+        this.downloaded = downloaded;
     }
 }

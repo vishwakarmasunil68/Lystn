@@ -19,7 +19,9 @@
     android:background="#F9F9F9"
     android:clickable="true">
 
-    <include layout="@layout/player_content" />
+    <include
+        android:id="@+id/layout_content"
+        layout="@layout/player_content" />
 
     <FrameLayout
         android:id="@+id/frame_bottom_sheet"

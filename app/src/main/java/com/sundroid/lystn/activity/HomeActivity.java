@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -46,12 +47,13 @@ import com.sundroid.lystn.pojo.artiste.ArtisteDetailPOJO;
 import com.sundroid.lystn.pojo.artiste.PodcastDetailPOJO;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
 import com.sundroid.lystn.pojo.home.HomePOJO;
-import com.sundroid.lystn.service.Constants;
+import com.sundroid.lystn.service.DownloadSongService;
 import com.sundroid.lystn.service.MediaService;
 import com.sundroid.lystn.util.Pref;
 import com.sundroid.lystn.util.StringUtils;
 import com.sundroid.lystn.util.TagUtils;
 import com.sundroid.lystn.util.ToastClass;
+import com.sundroid.lystn.util.UtilityFunction;
 import com.sundroid.lystn.webservice.ApiCallBase;
 import com.sundroid.lystn.webservice.WebServicesCallBack;
 import com.sundroid.lystn.webservice.WebServicesUrls;
@@ -60,6 +62,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -122,7 +125,6 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
     List<String> artisteFollowUpList = new ArrayList<>();
     List<String> genreFollowUpList = new ArrayList<>();
 
-    String media_type = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,7 +173,25 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
 
         checkUserProfileLoaded();
 
+        String appDir = UtilityFunction.getAppDirectory(getApplicationContext());
+        UtilityFunction.createAppSongDir(getApplicationContext());
+        listAllFiles(appDir);
+
+
     }
+
+
+    public void listAllFiles(String file_path) {
+        File file = new File(file_path);
+        if (file.exists()) {
+            String[] files = file.list();
+            Log.d(TagUtils.getTag(), "files length:-" + files.length);
+            for (String f : files) {
+                Log.d(TagUtils.getTag(), "inner file:-" + f);
+            }
+        }
+    }
+
 
     public void checkUserProfileLoaded() {
 
@@ -273,8 +293,8 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
                 viewPager.setCurrentItem(0);
                 break;
             case R.id.ll_search:
-                if(fragmentList.size()>0){
-                    for(int i=0;i<fragmentList.size();i++){
+                if (fragmentList.size() > 0) {
+                    for (int i = 0; i < fragmentList.size(); i++) {
                         onBackPressed();
                     }
                 }
@@ -296,12 +316,14 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TagUtils.getTag(), "registering receiver");
         getApplicationContext().registerReceiver(mMessageReceiver, new IntentFilter(StringUtils.UPDATE_HOME_ACTIVITY));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d(TagUtils.getTag(), "destroying receiver");
         getApplicationContext().unregisterReceiver(mMessageReceiver);
     }
 
@@ -331,7 +353,17 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
     public void startMusicPlayerFragment() {
         if (homeContentPOJOS != null && homeContentPOJOS.size() > 0 && playingPosition != -1) {
             makeTransparentStatusBar();
-            startFragment(R.id.frame_home_activity, musicPlayerFragment = new MusicPlayerFragment(homeContentPOJOS,playingPosition, podcastDetailPOJO));
+            startFragment(R.id.frame_home_activity, musicPlayerFragment = new MusicPlayerFragment(homeContentPOJOS, playingPosition, podcastDetailPOJO));
+            new CountDownTimer(2000, 1000) {
+
+                public void onTick(long millisUntilFinished) {
+                    ll_small_player.setEnabled(false);
+                }
+
+                public void onFinish() {
+                    ll_small_player.setEnabled(true);
+                }
+            }.start();
         }
     }
 
@@ -401,13 +433,12 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
     public void playAudio(List<HomeContentPOJO> homeContentPOJOS, int position, String type, PodcastDetailPOJO podcastDetailPOJO) {
         ll_small_player.setVisibility(View.VISIBLE);
         Pref.SetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, type);
-        this.media_type = type;
         this.homeContentPOJOS.clear();
         this.homeContentPOJOS.addAll(homeContentPOJOS);
         this.playingPosition = position;
         this.podcastDetailPOJO = podcastDetailPOJO;
         if (podcastDetailPOJO != null) {
-            Pref.SetStringPref(getApplicationContext(), StringUtils.NOTIFICAION_ALBUM_NAME, podcastDetailPOJO.getTitle());
+            Pref.SetStringPref(getApplicationContext(), StringUtils.NOTIFICAION_ALBUM_NAME, podcastDetailPOJO.getTitle().trim());
         }
         startMusicPlayerFragment();
         startPlayer(this.homeContentPOJOS.get(playingPosition));
@@ -417,9 +448,8 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         showProgressBar();
         if (!isMyServiceRunning(MediaService.class)) {
             Intent serviceIntent = new Intent(HomeActivity.this, MediaService.class);
-            serviceIntent.setAction(Constants.ACTION.STARTFOREGROUND_ACTION);
+//            serviceIntent.setAction(Constants.ACTION.STARTFOREGROUND_ACTION);
             serviceIntent.putExtra(StringUtils.AUDIO_DATA, new Gson().toJson(homeContentPOJO));
-            serviceIntent.putExtra(StringUtils.MEDIA_TYPE, media_type);
             startService(serviceIntent);
         } else {
             playSongMessageToService(homeContentPOJO);
@@ -454,7 +484,6 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
             Intent intent = new Intent(StringUtils.UPDATE_SERVICE);
             intent.putExtra("type", StringUtils.PLAY_SONG);
             intent.putExtra(StringUtils.AUDIO_DATA, homeContentPOJO);
-            intent.putExtra(StringUtils.MEDIA_TYPE, media_type);
             sendBroadcast(intent);
         } catch (Exception e) {
             e.printStackTrace();
@@ -476,8 +505,8 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         public void onReceive(Context context, Intent intent) {
             try {
                 String type = intent.getStringExtra("type");
-//                Log.d(TagUtils.getTag(), "type:-" + type);
-                if (type.equalsIgnoreCase("dismiss_progress")) {
+                Log.d(TagUtils.getTag(), "HomeType:-" + type);
+                if (type.equalsIgnoreCase(StringUtils.DISMISS_PROGRESS_BAR)) {
                     dismissProgressBar();
                 } else if (type.equalsIgnoreCase(StringUtils.MUSIC_PLAYING_STATUS)) {
                     Log.d(TagUtils.getTag(), "setting music Player status");
@@ -491,10 +520,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
                         musicPlayerFragment.updateTimings(intent.getIntExtra(StringUtils.CURRENT_MEDIA_TIME, 0), intent.getIntExtra(StringUtils.MEDIA_DURATION, 0));
                     }
                     updateTimings(intent.getIntExtra(StringUtils.CURRENT_MEDIA_TIME, 0), intent.getIntExtra(StringUtils.MEDIA_DURATION, 0));
-//                    if (homeFragment != null) {
-//                        homeFragment.updateTimings(intent.getIntExtra(StringUtils.CURRENT_MEDIA_TIME, 0), intent.getIntExtra(StringUtils.MEDIA_DURATION, 0));
-//                    }
-                }else if(type.equalsIgnoreCase(StringUtils.PLAY_COMPLETED)){
+                } else if (type.equalsIgnoreCase(StringUtils.PLAY_COMPLETED)) {
                     nextSong();
                 }
             } catch (Exception e) {
@@ -541,7 +567,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
     }
 
     public void makeTransparentStatusBar() {
-        Log.d(TagUtils.getTag(),"transparent background");
+        Log.d(TagUtils.getTag(), "transparent background");
         if (Build.VERSION.SDK_INT >= 19 && Build.VERSION.SDK_INT < 21) {
             setWindowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, true);
         }
@@ -772,13 +798,13 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
 
     @Override
     public void onBackPressed() {
-        if(fragmentList.size()==0){
-            if(viewPager.getCurrentItem()==0) {
+        if (fragmentList.size() == 0) {
+            if (viewPager.getCurrentItem() == 0) {
                 super.onBackPressed();
-            }else{
+            } else {
                 viewPager.setCurrentItem(0);
             }
-        }else{
+        } else {
             super.onBackPressed();
         }
     }
@@ -836,8 +862,8 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         iv_play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    tv_name.setText(homeContentPOJO.getConName());
-                    playPausePlayer();
+                tv_name.setText(homeContentPOJO.getConName());
+                playPausePlayer();
             }
         });
 
@@ -884,5 +910,13 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         }
 
         return min + " : " + sec;
+    }
+
+    public void downloadSong(String conID, String url) {
+        Log.d(TagUtils.getTag(),"downloading song");
+        Intent serviceIntent = new Intent(HomeActivity.this, DownloadSongService.class);
+        serviceIntent.putExtra("conId", conID);
+        serviceIntent.putExtra("url", url);
+        startService(serviceIntent);
     }
 }

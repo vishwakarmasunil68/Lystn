@@ -59,5 +59,6 @@ dependencies {
     compile 'com.borjabravo:readmoretextview:2.1.0'
     implementation 'com.github.AhmMhd:SeeMoreTextView-Android:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'
+    compile 'com.ixuea:AndroidDownloader:2.0.4'
 }
 apply plugin: 'com.google.gms.google-services'

@@ -37,10 +37,8 @@ import java.net.URL;
 public class MediaService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
 
     MediaPlayer mediaPlayer;
-    boolean isMediaPlayerSetOnce = false;
     int play_progress;
     HomeContentPOJO homeContentPOJO;
-//    String media_type = "";
 
     //MediaSession
     private MediaSessionManager mediaSessionManager;
@@ -93,11 +91,6 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
 
     public void sendMessageToHome(String command, Object object) {
         try {
-//            JSONObject jsonObject = new JSONObject();
-//            jsonObject.put(StringUtils.COMMAND, command);
-//            if (object != null) {
-//                jsonObject.put(StringUtils.AUDIO_DATA, new Gson().toJson(object));
-//            }
             Intent intent = new Intent(StringUtils.UPDATE_HOME_ACTIVITY);
             intent.putExtra("type", command);
             sendBroadcast(intent);
@@ -109,11 +102,6 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TagUtils.getTag(), "onstartcommand service");
-
-        //Handle Intent action from MediaSession.TransportControls
-
-//        media_type=intent.getStringExtra(StringUtils.MEDIA_TYPE);
-        Log.d(TagUtils.getTag(), "media_type:-" + intent.getStringExtra(StringUtils.MEDIA_TYPE));
 
         if (intent.getStringExtra(StringUtils.AUDIO_DATA) != null) {
             try {
@@ -127,10 +115,9 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
                         e.printStackTrace();
                         stopSelf();
                     }
+                    Log.d(TagUtils.getTag(), "registering receiver");
                     getApplicationContext().registerReceiver(mMessageReceiver, new IntentFilter(StringUtils.UPDATE_SERVICE));
-                    buildNotification(PlaybackStatus.PLAYING);
                 }
-
                 startMediaPlayer(homeContentPOJO.getCotDeepLink());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -185,7 +172,7 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
                 super.onPause();
                 Log.d(TagUtils.getTag(), "media onPause");
                 pauseMedia();
-                buildNotification(PlaybackStatus.PAUSED);
+
             }
 
             @Override
@@ -324,8 +311,9 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
     public void playMedia() {
         if (mediaPlayer != null && (!mediaPlayer.isPlaying())) {
             mediaPlayer.start();
-            playingStatusInHome(true);
+            buildNotification(PlaybackStatus.PLAYING);
             mBuilder.setOngoing(true);
+            playingStatusInHome(true);
         }
     }
 
@@ -340,7 +328,7 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public void updateMediaTiming() {
-        if ((mediaPlayer != null) && (mediaPlayer.isPlaying()) && !Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").equals("radio")) {
+        if ((mediaPlayer != null) && (mediaPlayer.isPlaying()) && !(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").equals("radio"))) {
             Intent intent = new Intent(StringUtils.UPDATE_HOME_ACTIVITY);
             intent.putExtra("type", StringUtils.MEDIA_TIMINGS);
             intent.putExtra(StringUtils.MEDIA_DURATION, mediaPlayer.getDuration());
@@ -402,15 +390,13 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public void onPrepared(MediaPlayer mp) {
         dismissHomeProgressBar();
-        isMediaPlayerSetOnce = true;
         playMedia();
         updateMediaTiming();
-
     }
 
     private void dismissHomeProgressBar() {
         Intent intent = new Intent(StringUtils.UPDATE_HOME_ACTIVITY);
-        intent.putExtra("type", "dismiss_progress");
+        intent.putExtra("type", StringUtils.DISMISS_PROGRESS_BAR);
         sendBroadcast(intent);
     }
 
@@ -512,18 +498,22 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                if (theBitmap != null) {
-                    Log.d(TagUtils.getTag(), "setting notification metadata");
-                    mBuilder.setLargeIcon(theBitmap);
-                    mBuilder.setContentText(homeContentPOJO.getConName());
-                    if (Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").equalsIgnoreCase("radio")) {
-                        mBuilder.setContentTitle(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, ""));
-                    } else {
-                        mBuilder.setContentTitle(Pref.GetStringPref(getApplicationContext(), StringUtils.NOTIFICAION_ALBUM_NAME, ""));
-                    }
+                try {
+                    if(theBitmap != null){
+                        Log.d(TagUtils.getTag(), "setting notification metadata");
+                        mBuilder.setLargeIcon(theBitmap);
+                        mBuilder.setContentText(homeContentPOJO.getConName().trim());
+                        if (Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").equalsIgnoreCase("radio")) {
+                            mBuilder.setContentTitle(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").trim());
+                        } else {
+                            mBuilder.setContentTitle(Pref.GetStringPref(getApplicationContext(), StringUtils.NOTIFICAION_ALBUM_NAME, "").trim());
+                        }
 
-                    mBuilder.setContentInfo(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, ""));
-                    notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+                        mBuilder.setContentInfo(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").trim());
+                        notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }.execute();
@@ -573,6 +563,7 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
             transportControls.play();
         } else if (actionString.equalsIgnoreCase(ACTION_PAUSE)) {
             Log.d(TagUtils.getTag(), "handling pause");
+            buildNotification(PlaybackStatus.PAUSED);
             pauseMedia();
             transportControls.pause();
         } else if (actionString.equalsIgnoreCase(ACTION_NEXT)) {

@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.sundroid.lystn.R;
+import com.sundroid.lystn.activity.HomeActivity;
 import com.sundroid.lystn.fragment.playlist.PodcastPlayListFragment;
 import com.sundroid.lystn.pojo.artiste.PodcastEpisodeDetailsPOJO;
 
@@ -54,11 +56,22 @@ public class GenrePlayListAdapter extends RecyclerView.Adapter<GenrePlayListAdap
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(fragment !=null && fragment instanceof PodcastPlayListFragment){
-                    PodcastPlayListFragment podcastPlayListFragment= (PodcastPlayListFragment) fragment;
+                if (fragment != null && fragment instanceof PodcastPlayListFragment) {
+                    PodcastPlayListFragment podcastPlayListFragment = (PodcastPlayListFragment) fragment;
                     podcastPlayListFragment.playAudio(position);
                 }
 
+            }
+        });
+
+        holder.iv_download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                if()
+                if (activity instanceof HomeActivity) {
+                    HomeActivity homeActivity = (HomeActivity) activity;
+                    homeActivity.downloadSong(items.get(position).getEpisodeId(), items.get(position).getStreamUri());
+                }
             }
         });
 
@@ -73,7 +86,7 @@ public class GenrePlayListAdapter extends RecyclerView.Adapter<GenrePlayListAdap
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-//        @BindView(R.id.iv_episode)
+        //        @BindView(R.id.iv_episode)
 //        ImageView iv_episode;
         @BindView(R.id.tv_episode_name)
         TextView tv_episode_name;
@@ -83,6 +96,8 @@ public class GenrePlayListAdapter extends RecyclerView.Adapter<GenrePlayListAdap
         TextView tv_duration;
         @BindView(R.id.tv_sequence)
         TextView tv_sequence;
+        @BindView(R.id.iv_download)
+        ImageView iv_download;
 
         public ViewHolder(View itemView) {
             super(itemView);
