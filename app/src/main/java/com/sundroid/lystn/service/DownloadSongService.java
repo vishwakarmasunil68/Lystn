@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -17,17 +18,22 @@ import com.ixuea.android.downloader.callback.DownloadManager;
 import com.ixuea.android.downloader.domain.DownloadInfo;
 import com.ixuea.android.downloader.exception.DownloadException;
 import com.sundroid.lystn.R;
+import com.sundroid.lystn.pojo.artiste.PodcastEpisodeDetailsPOJO;
+import com.sundroid.lystn.util.StringUtils;
 import com.sundroid.lystn.util.TagUtils;
+import com.sundroid.lystn.util.ToastClass;
 import com.sundroid.lystn.util.UtilityFunction;
 
 import java.io.File;
 
+import p32929.androideasysql_library.EasyDB;
+
 public class DownloadSongService extends Service {
 
     DownloadManager downloadManager;
-    String conId;
-    String url;
-    String file_name;
+//    String conId;
+//    String url;
+//    String file_name;
 
     private NotificationManager mNotifyManager;
     private NotificationCompat.Builder mBuilder;
@@ -49,99 +55,178 @@ public class DownloadSongService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TagUtils.getTag(), "on start");
-        conId = intent.getStringExtra("conId");
-        url = intent.getStringExtra("url");
-
-        Log.d(TagUtils.getTag(), "onstart command");
-
-        file_name = UtilityFunction.createTestingDir(getApplicationContext()) + File.separator +
-                conId + ".mp3";
-
-        Log.d(TagUtils.getTag(), "file name:-" + file_name);
-
-        startDownload();
+//        conId = intent.getStringExtra("conId");
+//        url = intent.getStringExtra("url");
+//
+//        Log.d(TagUtils.getTag(), "onstart command");
+//
+//        file_name = UtilityFunction.createTestingDir(getApplicationContext()) + File.separator +
+//                conId + ".mp3";
+//
+//        Log.d(TagUtils.getTag(), "file name:-" + file_name);
+//
+//        startDownload();
+        try {
+            PodcastEpisodeDetailsPOJO podcastEpisodeDetailsPOJO = (PodcastEpisodeDetailsPOJO) intent.getSerializableExtra("podcast_episode");
+            String type = intent.getStringExtra("type");
+            Log.d(TagUtils.getTag(), podcastEpisodeDetailsPOJO.toString());
+            startDownload(type, podcastEpisodeDetailsPOJO);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return START_NOT_STICKY;
     }
 
-    private void startDownload() {
-        final DownloadInfo[] downloadInfo = {new DownloadInfo.Builder().setUrl(url.trim())
-                .setPath(file_name)
-                .build()};
+    public void checkSonginDB() {
+        EasyDB easyDB = EasyDB.init(getApplicationContext(), "Lystn").setTableName("downloads");
+        Cursor res = easyDB.searchInColumn("ID", "data", -1); // Here we passed limit = -1. Thus it will return all the rows with the matched column values
+        if (res != null) {
+            while (res.moveToNext()) {
+                String ID = res.getString(0); // Column 0 is the ID column
+                String c1 = res.getString(1);
+                String c2 = res.getString(2);
+            }
+        }
+    }
 
-        downloadInfo[0].setDownloadListener(new DownloadListener() {
+    private void startDownload(String type, PodcastEpisodeDetailsPOJO podcastEpisodeDetailsPOJO) {
 
-            @Override
-            public void onStart() {
-                Log.d(TagUtils.getTag(), "Prepare downloading");
-                mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        String file_name = UtilityFunction.createTestingDir(getApplicationContext()) + File.separator + podcastEpisodeDetailsPOJO.getEpisodeId() + ".mp3";
+        if (!new File(file_name).exists()) {
+            final DownloadInfo[] downloadInfo = {new DownloadInfo.Builder().setUrl(podcastEpisodeDetailsPOJO.getStreamUri().trim())
+                    .setPath(file_name)
+                    .build()};
 
-                int notificationId = 1;
-                String channelId = "channel-01";
-                String channelName = "Channel Name";
-                int importance = NotificationManager.IMPORTANCE_HIGH;
+            downloadInfo[0].setDownloadListener(new DownloadListener() {
 
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    NotificationChannel mChannel = new NotificationChannel(
-                            channelId, channelName, importance);
-                    mNotifyManager.createNotificationChannel(mChannel);
+                @Override
+                public void onStart() {
+                    Log.d(TagUtils.getTag(), "Prepare downloading");
+
+                    ToastClass.showShortToast(getApplicationContext(),"Download started");
+
+                    mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+                    int notificationId = (int) System.currentTimeMillis();
+                    String channelId = "channel-01";
+                    String channelName = "Channel Name";
+                    int importance = NotificationManager.IMPORTANCE_HIGH;
+
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        NotificationChannel mChannel = new NotificationChannel(
+                                channelId, channelName, importance);
+                        mNotifyManager.createNotificationChannel(mChannel);
+                    }
+
+                    mBuilder = new NotificationCompat.Builder(getApplicationContext(), channelId);
+                    mBuilder.setContentTitle(podcastEpisodeDetailsPOJO.getTitle().trim())
+                            .setContentText("Download in progress")
+                            .setSmallIcon(R.mipmap.ic_launcher);
                 }
 
-                mBuilder = new NotificationCompat.Builder(getApplicationContext(), channelId);
-                mBuilder.setContentTitle("File Download")
-                        .setContentText("Download in progress")
-                        .setSmallIcon(R.mipmap.ic_launcher);
-            }
+                @Override
+                public void onWaited() {
+                    Log.d(TagUtils.getTag(), "Waiting");
+                    Log.d(TagUtils.getTag(), "Pause");
+                }
 
-            @Override
-            public void onWaited() {
-                Log.d(TagUtils.getTag(), "Waiting");
-                Log.d(TagUtils.getTag(), "Pause");
-            }
+                @Override
+                public void onPaused() {
+                    Log.d(TagUtils.getTag(), "Continue");
+                    Log.d(TagUtils.getTag(), "Paused");
+                }
 
-            @Override
-            public void onPaused() {
-                Log.d(TagUtils.getTag(), "Continue");
-                Log.d(TagUtils.getTag(), "Paused");
-            }
+                @Override
+                public void onDownloading(long progress, long size) {
 
-            @Override
-            public void onDownloading(long progress, long size) {
+                    mBuilder.setProgress((int) size, (int) progress, false);
+                    mNotifyManager.notify(id, mBuilder.build());
 
-                mBuilder.setProgress((int) size, (int) progress, false);
-                mNotifyManager.notify(id, mBuilder.build());
+                    Log.d(TagUtils.getTag(), "progress:-" + progress + "/size:-" + size);
+                    Log.d(TagUtils.getTag(), "Pause");
+                }
 
-                Log.d(TagUtils.getTag(), "progress:-" + progress + "/size:-" + size);
-                Log.d(TagUtils.getTag(), "Pause");
-            }
+                @Override
+                public void onRemoved() {
+                    Log.d(TagUtils.getTag(), "Download");
+                    Log.d(TagUtils.getTag(), "");
+                    downloadInfo[0] = null;
+                }
 
-            @Override
-            public void onRemoved() {
-                Log.d(TagUtils.getTag(), "Download");
-                Log.d(TagUtils.getTag(), "");
-                downloadInfo[0] = null;
-            }
+                @Override
+                public void onDownloadSuccess() {
+                    ToastClass.showShortToast(getApplicationContext(), "Download Complete");
+                    Log.d(TagUtils.getTag(), "Delete");
+                    Log.d(TagUtils.getTag(), "Download success");
+                    mBuilder.setContentText("Download completed")
+                            // Removes the progress bar
+                            .setProgress(0, 0, false);
+                    mNotifyManager.notify(id, mBuilder.build());
 
-            @Override
-            public void onDownloadSuccess() {
-                Log.d(TagUtils.getTag(), "Delete");
-                Log.d(TagUtils.getTag(), "Download success");
-                mBuilder.setContentText("Download completed")
-                        // Removes the progress bar
-                        .setProgress(0, 0, false);
-                mNotifyManager.notify(id, mBuilder.build());
-                stopSelf();
-            }
+                    updatHomeActivity(StringUtils.DOWNLOAD_SONG_TYPE, podcastEpisodeDetailsPOJO);
 
-            @Override
-            public void onDownloadFailed(DownloadException e) {
-                e.printStackTrace();
-                Log.d(TagUtils.getTag(), "Download fail:" + e.getMessage());
-            }
-        });
+                    stopSelf();
+                }
 
-        downloadManager.download(downloadInfo[0]);
+                @Override
+                public void onDownloadFailed(DownloadException e) {
+                    e.printStackTrace();
+                    Log.d(TagUtils.getTag(), "Download fail:" + e.getMessage());
+                }
+            });
+
+            downloadManager.download(downloadInfo[0]);
+        } else {
+            ToastClass.showShortToast(getApplicationContext(), "Download Complete");
+            updatHomeActivity(StringUtils.DOWNLOAD_SONG_TYPE, podcastEpisodeDetailsPOJO);
+            stopSelf();
+        }
     }
+
+//    public void initDB() {
+//        //type:-  podcast song =1
+//        EasyDB easyDB = EasyDB.init(this, "Lystn") // "TEST" is the name of the DATABASE
+//                .setTableName("downloads")  // You can ignore this line if you want
+////                .addColumn(new Column("id", new String[]{"text", "unique"}))
+//                .addColumn(new Column("type", new String[]{"text", "not null"}))
+//                .addColumn(new Column("pojo", new String[]{"text"}))
+//                .doneTableColumn();
+//
+//        addsong();
+//    }
+//
+//    public void addsong(String type, String pojo) {
+//        EasyDB easyDB = EasyDB.init(this, "Lystn").setTableName("downloads");
+//        boolean done = easyDB
+//                .addData("type", type)
+//                .addData("pojo", pojo)
+//                .doneDataAdding();
+//
+//        readAllData();
+//    }
+
+    public void updatHomeActivity(String type, PodcastEpisodeDetailsPOJO
+            podcastEpisodeDetailsPOJO) {
+        try {
+            Intent intent = new Intent(StringUtils.UPDATE_HOME_ACTIVITY);
+            intent.putExtra("type", StringUtils.SAVE_SONG_DB);
+            intent.putExtra("podcast_id", podcastEpisodeDetailsPOJO.getEpisodeId());
+            intent.putExtra("pojo", podcastEpisodeDetailsPOJO);
+            sendBroadcast(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+//
+//    public void readAllData() {
+//        EasyDB easyDB = EasyDB.init(this, "Lystn").setTableName("downloads");
+//        Cursor res = easyDB.getAllData();
+//        while (res.moveToNext()) {
+//            Log.d(TagUtils.getTag(), "data reading:- col1:-" + res.getString(0) + ",col2:-" + res.getString(1) + ",col3:-" + res.getString(2));
+//        }
+//    }
+
 
     @Override
     public void onDestroy() {

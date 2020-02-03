@@ -63,6 +63,14 @@ public class GenrePlayListAdapter extends RecyclerView.Adapter<GenrePlayListAdap
 
             }
         });
+        if (activity instanceof HomeActivity) {
+            HomeActivity homeActivity = (HomeActivity) activity;
+            if (homeActivity.getDbManager().checkSongInDB(items.get(position).getEpisodeId())) {
+                holder.iv_download.setVisibility(View.GONE);
+            } else {
+                holder.iv_download.setVisibility(View.VISIBLE);
+            }
+        }
 
         holder.iv_download.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,8 +78,10 @@ public class GenrePlayListAdapter extends RecyclerView.Adapter<GenrePlayListAdap
 //                if()
                 if (activity instanceof HomeActivity) {
                     HomeActivity homeActivity = (HomeActivity) activity;
-                    homeActivity.downloadSong(items.get(position).getEpisodeId(), items.get(position).getStreamUri());
+//                    homeActivity.downloadSong(items.get(position).getEpisodeId(), items.get(position).getStreamUri());
+                    homeActivity.downloadSong(items.get(position));
                 }
+                holder.iv_download.setVisibility(View.GONE);
             }
         });
 

@@ -22,6 +22,7 @@ import com.sundroid.lystn.util.StringUtils;
 import com.sundroid.lystn.util.UtilityFunction;
 
 import butterknife.BindView;
+import p32929.androideasysql_library.EasyDB;
 
 public class MeFragment extends FragmentController {
 
@@ -39,8 +40,8 @@ public class MeFragment extends FragmentController {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.frag_me,container,false);
-        setUpView(getActivity(),this,view);
+        View view = inflater.inflate(R.layout.frag_me, container, false);
+        setUpView(getActivity(), this, view);
         return view;
     }
 
@@ -51,7 +52,7 @@ public class MeFragment extends FragmentController {
         iv_subscription.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getActivity() instanceof HomeActivity){
+                if (getActivity() instanceof HomeActivity) {
                     HomeActivity homeActivity = (HomeActivity) getActivity();
                     homeActivity.showUnLockPremiumFragment();
                 }
@@ -61,8 +62,8 @@ public class MeFragment extends FragmentController {
         ll_subscription.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getActivity() instanceof HomeActivity){
-                    HomeActivity homeActivity= (HomeActivity) getActivity();
+                if (getActivity() instanceof HomeActivity) {
+                    HomeActivity homeActivity = (HomeActivity) getActivity();
                     homeActivity.startManageSubscription();
                 }
             }
@@ -71,33 +72,40 @@ public class MeFragment extends FragmentController {
         ll_language.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getActivity() instanceof HomeActivity){
-                    HomeActivity homeActivity= (HomeActivity) getActivity();
+                if (getActivity() instanceof HomeActivity) {
+                    HomeActivity homeActivity = (HomeActivity) getActivity();
                     homeActivity.startSelectLangageFragment();
                 }
             }
         });
 
-        try{
-            UserPOJO userPOJO= UtilityFunction.getUserPOJO(getActivity().getApplicationContext());
-            if(userPOJO!=null){
+        try {
+            UserPOJO userPOJO = UtilityFunction.getUserPOJO(getActivity().getApplicationContext());
+            if (userPOJO != null) {
                 tv_user_name.setText(userPOJO.getMobileNo());
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         ll_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Pref.SetStringPref(getActivity().getApplicationContext(),StringUtils.ARTISTE_FOLLOW_UP_STRING,"");
-                Pref.SetStringPref(getActivity().getApplicationContext(),StringUtils.GENRE_FOLLOW_UP_STRING,"");
+
+                clearSongDB();
+
+                Pref.SetStringPref(getActivity().getApplicationContext(), StringUtils.ARTISTE_FOLLOW_UP_STRING, "");
+                Pref.SetStringPref(getActivity().getApplicationContext(), StringUtils.GENRE_FOLLOW_UP_STRING, "");
                 Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.IS_USER_PROFILE_LOADED, false);
-                Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.IS_LOGIN,false);
+                Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.IS_LOGIN, false);
                 startActivity(new Intent(getActivity(), LoginActivity.class));
                 getActivity().finishAffinity();
             }
         });
+    }
 
+    public void clearSongDB() {
+        EasyDB easyDB = EasyDB.init(getActivity(), "Lystn").setTableName("downloads");
+        easyDB.deleteAllDataFromTable();
     }
 }

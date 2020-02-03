@@ -2,15 +2,19 @@ package com.sundroid.lystn.fragment.home;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
@@ -26,6 +30,7 @@ import com.sundroid.lystn.pojo.artiste.PodcastPOJO;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
 import com.sundroid.lystn.util.Pref;
 import com.sundroid.lystn.util.StringUtils;
+import com.sundroid.lystn.util.TagUtils;
 import com.sundroid.lystn.util.ToastClass;
 import com.sundroid.lystn.webservice.ApiCallBase;
 import com.sundroid.lystn.webservice.WebServicesCallBack;
@@ -68,6 +73,8 @@ public class GenreDetailFragment extends FragmentController {
     ImageView iv_favorited;
     @BindView(R.id.tv_phases)
     TextView tv_phases;
+    @BindView(R.id.ll_sorting)
+    LinearLayout ll_sorting;
 
     PodcastDetailPOJO podcastDetailPOJO;
 
@@ -208,19 +215,43 @@ public class GenreDetailFragment extends FragmentController {
             }
         });
 
+        ll_sorting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popup = new PopupMenu(getActivity(), v);
+                //Inflating the Popup using xml file
+                popup.getMenuInflater().inflate(R.menu.menu_sort_popup, popup.getMenu());
+
+                //registering popup with OnMenuItemClickListener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+//                        Toast.makeText(getActivity().getApplicationContext(), "You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                        switch (item.getItemId()) {
+                            case R.id.popup_az:
+                                Log.d(TagUtils.getTag(), "az clicked");
+                                podcastPlayListFragment.sortAsc(true);
+                                break;
+                            case R.id.popup_za:
+                                Log.d(TagUtils.getTag(), "za clicked");
+                                podcastPlayListFragment.sortAsc(false);
+                                break;
+                        }
+                        return true;
+                    }
+                });
+                popup.show();//showing popup menu
+            }
+        });
     }
+
 
     public void changeFollowText() {
         if (getActivity() instanceof HomeActivity) {
             HomeActivity homeActivity = (HomeActivity) getActivity();
             if (homeActivity.getArtisteFollowUpList().contains(conId)) {
-//                btn_follow.setText("unfollow");
-                btn_follow.setVisibility(View.GONE);
-                iv_favorited.setVisibility(View.VISIBLE);
+                iv_favorited.setImageResource(R.drawable.ic_following_new);
             } else {
-//                btn_follow.setText("follow");
-                btn_follow.setVisibility(View.VISIBLE);
-                iv_favorited.setVisibility(View.GONE);
+                iv_favorited.setImageResource(R.drawable.ic_following_new);
             }
         }
     }
@@ -272,7 +303,7 @@ public class GenreDetailFragment extends FragmentController {
 
 //                        podcastEpisodeDetailsPOJOS.addAll(podcastPOJO.getPodcastEpisodeDetailsPOJOS());
                         podcastPlayListFragment.setPodcastList(podcastPOJO.getPodcastDetailPOJO(), podcastPOJO.getPodcastEpisodeDetailsPOJOS());
-                        tv_phases.setText(podcastPOJO.getPodcastEpisodeDetailsPOJOS().size() + " Phases");
+                        tv_phases.setText(podcastPOJO.getPodcastEpisodeDetailsPOJOS().size() + " Episodes");
 
                     } else {
                         ToastClass.showShortToast(getActivity().getApplicationContext(), "Something went wrong");

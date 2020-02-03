@@ -3,7 +3,9 @@ package com.sundroid.lystn.pojo.artiste;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class PodcastEpisodeDetailsPOJO {
+import java.io.Serializable;
+
+public class PodcastEpisodeDetailsPOJO implements Serializable {
 
     @SerializedName("episode_id")
     @Expose
@@ -211,5 +213,30 @@ public class PodcastEpisodeDetailsPOJO {
 
     public void setDownloaded(boolean downloaded) {
         this.downloaded = downloaded;
+    }
+
+    @Override
+    public String toString() {
+        return "PodcastEpisodeDetailsPOJO{" +
+                "episodeId='" + episodeId + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", subtitle='" + subtitle + '\'' +
+                ", imgid=" + imgid +
+                ", episodetype='" + episodetype + '\'' +
+                ", keywords='" + keywords + '\'' +
+                ", episodeSeq=" + episodeSeq +
+                ", duration=" + duration +
+                ", isexplicit='" + isexplicit + '\'' +
+                ", streamUri='" + streamUri + '\'' +
+                ", length=" + length +
+                ", imgRemoteUri=" + imgRemoteUri +
+                ", imgLocalUri=" + imgLocalUri +
+                ", imgHeight=" + imgHeight +
+                ", imgWidth=" + imgWidth +
+                ", imgType=" + imgType +
+                ", addedOn='" + addedOn + '\'' +
+                ", downloaded=" + downloaded +
+                '}';
     }
 }

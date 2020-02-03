@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.sundroid.lystn.R;
+import com.sundroid.lystn.fragment.login.LoginTagFragment;
 import com.sundroid.lystn.pojo.login.CategoryTagPOJO;
 
 import java.util.List;
@@ -45,6 +46,10 @@ public class GenreCategoryAdapter extends RecyclerView.Adapter<GenreCategoryAdap
             @Override
             public void onClick(View v) {
                 items.get(position).setActive(!items.get(position).isActive());
+                if(fragment instanceof LoginTagFragment){
+                    LoginTagFragment loginTagFragment= (LoginTagFragment) fragment;
+                    loginTagFragment.continueBtnEnabling();
+                }
                 notifyDataSetChanged();
             }
         });

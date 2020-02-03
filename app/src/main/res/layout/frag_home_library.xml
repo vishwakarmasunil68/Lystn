@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
                 android:layout_marginLeft="15dp"
-                android:src="@drawable/ic_download"/>
+                android:src="@drawable/ic_lib_download"/>
 
             <com.sundroid.lystn.view.RobotoRegularTV
                 android:layout_width="wrap_content"

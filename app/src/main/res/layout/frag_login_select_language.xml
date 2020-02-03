@@ -58,26 +58,36 @@
         android:layout_height="wrap_content"
         android:layout_weight="1" />
 
-    <FrameLayout
-        android:id="@+id/frame_continue"
+    <ImageView
+        android:id="@+id/iv_continue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center">
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/ic_continue_btn_disabled"/>
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="5dp"
-            android:src="@drawable/ic_country_continue" />
+    <!--    <FrameLayout-->
+    <!--        android:id="@+id/frame_continue"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_gravity="center">-->
 
-        <com.sundroid.lystn.view.SFProBoldTV
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="CONTINUE"
-            android:textSize="16sp"
-            android:textColor="#FFFFFF" />
-    </FrameLayout>
+    <!--        <ImageView-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_gravity="center"-->
+    <!--            android:layout_marginTop="5dp"-->
+    <!--            android:src="@drawable/ic_country_continue" />-->
+
+    <!--        <com.sundroid.lystn.view.SFProBoldTV-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_gravity="center"-->
+    <!--            android:text="CONTINUE"-->
+    <!--            android:textSize="16sp"-->
+    <!--            android:textColor="#FFFFFF" />-->
+    <!--    </FrameLayout>-->
 
 </LinearLayout>

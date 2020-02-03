@@ -50,6 +50,8 @@ public class ArtisteDetailFragment extends FragmentController {
     TextView tv_podcast_description;
     @BindView(R.id.iv_back)
     ImageView iv_back;
+    @BindView(R.id.iv_favorited)
+    ImageView iv_favorited;
 
     PodcastDetailPOJO podcastDetailPOJO;
 
@@ -81,6 +83,97 @@ public class ArtisteDetailFragment extends FragmentController {
         getPodcastDetails();
 
         attachGenericAdapter(recyclerView);
+
+        changeFollowText();
+
+        iv_favorited.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (getActivity() instanceof HomeActivity) {
+                    HomeActivity homeActivity = (HomeActivity) getActivity();
+                    if (homeActivity.getArtisteFollowUpList().contains(conId)) {
+                        homeActivity.showProgressBar();
+                        JSONObject jsonObject = new JSONObject();
+
+                        try {
+                            jsonObject.put("userId", Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.USER_ID, ""));
+                            jsonObject.put("deviceId", "91");
+                            jsonObject.put("followType", "artiste");
+                            jsonObject.put("followId", conId);
+                            jsonObject.put("langCode", "en");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        new ApiCallBase(getActivity(), new WebServicesCallBack() {
+                            @Override
+                            public void onGetMsg(String apicall, String response) {
+                                homeActivity.dismissProgressBar();
+                                try {
+                                    String object = new String(response);
+                                    JSONObject jsonObject = new JSONObject(object);
+                                    JSONObject responseObject = jsonObject.optJSONObject("response");
+//                                    ArtisteFollowUtil.removeArtisteFromList(activity.getApplicationContext(),String.valueOf(items.get(position).getConId()));
+//                                    homeActivity.getArtisteFollowUpList().remove(items.get(position).getConId());
+                                    homeActivity.removeFollowUP(StringUtils.ARTISTE_FOLLOW_UP_STRING, conId);
+//                                    Log.d(TagUtils.getTag(),"artiste list:-"+ArtisteFollowUtil.getArtisteList(activity.getApplicationContext()));
+
+                                    changeFollowText();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onErrorMsg(String status_code, String response) {
+
+                            }
+                        }, "UNFOLLOW_API").makeApiCall(WebServicesUrls.UNFOLLOW_API, jsonObject);
+                    } else {
+                        JSONObject jsonObject = new JSONObject();
+                        homeActivity.showProgressBar();
+                        try {
+                            jsonObject.put("userId", Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.USER_ID, ""));
+                            jsonObject.put("deviceId", "91");
+                            jsonObject.put("followType", "artiste");
+                            jsonObject.put("followId", conId);
+                            jsonObject.put("langCode", "en");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        new ApiCallBase(getActivity(), new WebServicesCallBack() {
+                            @Override
+                            public void onGetMsg(String apicall, String response) {
+                                homeActivity.dismissProgressBar();
+                                try {
+                                    String object = new String(response);
+                                    JSONObject jsonObject = new JSONObject(object);
+                                    JSONObject responseObject = jsonObject.optJSONObject("response");
+//                                    ArtisteFollowUtil.addFollowArtiste(activity.getApplicationContext(), String.valueOf(items.get(position).getConId()));
+//                                    Log.d(TagUtils.getTag(), jsonObject.toString());
+//                                    Log.d(TagUtils.getTag(),"artiste list:-"+ArtisteFollowUtil.getArtisteList(activity.getApplicationContext()));
+
+                                    homeActivity.addFollowUpData(StringUtils.ARTISTE_FOLLOW_UP_STRING, conId);
+
+//                                    homeActivity.getArtisteFollowUpList().add(items.get(position).getConId());
+
+                                    changeFollowText();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onErrorMsg(String status_code, String response) {
+
+                            }
+                        }, "FOLLOW_API").makeApiCall(WebServicesUrls.FOLLOW_API, jsonObject);
+                    }
+                }
+            }
+        });
     }
 
     List<PodcastEpisodeDetailsPOJO> podcastEpisodeDetailsPOJOS = new ArrayList<>();
@@ -95,6 +188,17 @@ public class ArtisteDetailFragment extends FragmentController {
         recyclerView.setAdapter(podcastEpisodeAdapter);
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    public void changeFollowText() {
+        if (getActivity() instanceof HomeActivity) {
+            HomeActivity homeActivity = (HomeActivity) getActivity();
+            if (homeActivity.getArtisteFollowUpList().contains(conId)) {
+                iv_favorited.setImageResource(R.drawable.ic_following_new);
+            } else {
+                iv_favorited.setImageResource(R.drawable.ic_follow_new);
+            }
+        }
     }
 
     public void getPodcastDetails() {

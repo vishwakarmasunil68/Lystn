@@ -117,10 +117,10 @@ public class LoginWithPhoneFragment extends FragmentController {
             public void afterTextChanged(Editable s) {
                 if (et_verification.getText().toString().length() == 4) {
                     iv_login_mobile.setEnabled(true);
-                    iv_login_mobile.setImageResource(R.drawable.ic_signin_enabled);
+                    iv_login_mobile.setImageResource(R.drawable.ic_signin_num_enabled);
                 } else {
                     iv_login_mobile.setEnabled(false);
-                    iv_login_mobile.setImageResource(R.drawable.ic_signin_disabled);
+                    iv_login_mobile.setImageResource(R.drawable.ic_signin_num_disabled);
                 }
             }
         });
@@ -202,6 +202,7 @@ public class LoginWithPhoneFragment extends FragmentController {
 
             @Override
             public void onFinish() {
+                tv_get_otp.setText("GET");
                 tv_get_otp.setEnabled(true);
                 tv_get_otp.setBackgroundResource(R.drawable.ic_get_activated);
             }

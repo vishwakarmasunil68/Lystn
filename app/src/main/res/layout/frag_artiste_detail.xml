@@ -25,10 +25,9 @@
 
             <ImageView
                 android:id="@+id/iv_back"
-                android:layout_width="wrap_content"
-                android:layout_height="18dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_marginLeft="10dp"
-                android:adjustViewBounds="true"
                 android:src="@drawable/ic_back" />
         </LinearLayout>
 
@@ -60,19 +59,21 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
 
         <ImageView
             android:id="@+id/iv_podcast_image"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
             android:src="@drawable/ic_playlist_logo" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
             android:orientation="vertical">
 
@@ -88,7 +89,7 @@
                     android:layout_height="wrap_content"
                     android:text="NPR"
                     android:textColor="#000000"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <com.sundroid.lystn.view.RobotoRegularTV
@@ -97,7 +98,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:maxLines="2"
-                    android:text="Push up-to-date news every week" />
+                    android:text="Push up-to-date news every week"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
@@ -107,12 +109,22 @@
                 android:layout_marginTop="5dp">
 
                 <Button
+                    android:id="@+id/btn_follow"
                     android:layout_width="wrap_content"
-                    android:layout_height="30dp"
+                    android:layout_height="28dp"
                     android:layout_gravity="right|bottom"
                     android:background="@drawable/ic_follow"
                     android:text="Follow"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#FFFFFF"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/iv_favorited"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_gravity="right|bottom"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/ic_follow_new" />
 
             </FrameLayout>
 
@@ -120,18 +132,84 @@
 
     </LinearLayout>
 
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:padding="10dp">-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/iv_podcast_image"-->
+<!--            android:layout_width="100dp"-->
+<!--            android:layout_height="100dp"-->
+<!--            android:adjustViewBounds="true"-->
+<!--            android:src="@drawable/ic_playlist_logo" />-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginLeft="10dp"-->
+<!--            android:orientation="vertical">-->
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:orientation="vertical">-->
+
+<!--                <com.sundroid.lystn.view.SFProBoldTV-->
+<!--                    android:id="@+id/tv_podcast_name"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="NPR"-->
+<!--                    android:textColor="#000000"-->
+<!--                    android:textSize="20sp"-->
+<!--                    android:textStyle="bold" />-->
+
+<!--                <com.sundroid.lystn.view.RobotoRegularTV-->
+<!--                    android:id="@+id/tv_podcast_description"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="5dp"-->
+<!--                    android:maxLines="2"-->
+<!--                    android:text="Push up-to-date news every week" />-->
+
+<!--            </LinearLayout>-->
+
+<!--            <FrameLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="5dp">-->
+
+<!--                <Button-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="30dp"-->
+<!--                    android:layout_gravity="right|bottom"-->
+<!--                    android:background="@drawable/ic_follow"-->
+<!--                    android:text="Follow"-->
+<!--                    android:textColor="#FFFFFF" />-->
+
+<!--            </FrameLayout>-->
+
+<!--        </LinearLayout>-->
+
+<!--    </LinearLayout>-->
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="#BDBDBD" />
+        android:background="#BDBDBD"
+        android:layout_marginTop="16dp"/>
 
     <com.sundroid.lystn.view.RobotoBoldTV
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Podcast by NPR"
+        android:layout_marginLeft="16dp"
         android:textColor="#000000"
         android:textSize="18sp"
-        android:layout_margin="15dp"/>
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

@@ -21,6 +21,8 @@ public class HomeContentPOJO implements Serializable {
     private String description;
     private String subtitle;
     private boolean playing;
+    private boolean showchecks;
+    private boolean checked;
 
     public String getConId() {
         return conId;
@@ -86,5 +88,21 @@ public class HomeContentPOJO implements Serializable {
 
     public void setPlaying(boolean playing) {
         this.playing = playing;
+    }
+
+    public boolean isShowchecks() {
+        return showchecks;
+    }
+
+    public void setShowchecks(boolean showchecks) {
+        this.showchecks = showchecks;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
     }
 }

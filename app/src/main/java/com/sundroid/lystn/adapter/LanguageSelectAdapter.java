@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.sundroid.lystn.R;
+import com.sundroid.lystn.fragment.login.LoginSelectLanguageFragment;
 import com.sundroid.lystn.pojo.LanguagePOJO;
 
 import java.util.List;
@@ -55,6 +56,10 @@ public class LanguageSelectAdapter extends RecyclerView.Adapter<LanguageSelectAd
                     items.get(i).setSelected(false);
                 }
                 items.get(position).setSelected(true);
+                if(fragment instanceof LoginSelectLanguageFragment){
+                    LoginSelectLanguageFragment loginSelectLanguageFragment= (LoginSelectLanguageFragment) fragment;
+                    loginSelectLanguageFragment.checkContinueVisibility();
+                }
                 notifyDataSetChanged();
             }
         });

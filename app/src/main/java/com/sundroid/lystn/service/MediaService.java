@@ -470,6 +470,8 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
                 .addAction(R.drawable.ic_queue, "next", playbackAction(5))
                 .setPriority(Notification.PRIORITY_MAX);
 
+
+
         if (homeContentPOJO != null) {
             uodateNotificationData();
         }
@@ -477,11 +479,33 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
         mBuilder.setContentIntent(play_pauseAction);
 
 //        notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+//        notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
 
+    Bitmap theBitmap;
+
     private void uodateNotificationData() {
+        if(theBitmap!=null){
+            try {
+                if(theBitmap != null){
+                    Log.d(TagUtils.getTag(), "setting notification metadata");
+                    mBuilder.setLargeIcon(theBitmap);
+                    mBuilder.setContentText(homeContentPOJO.getConName().trim());
+                    if (Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").equalsIgnoreCase("radio")) {
+                        mBuilder.setContentTitle(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").trim());
+                    } else {
+                        mBuilder.setContentTitle(Pref.GetStringPref(getApplicationContext(), StringUtils.NOTIFICAION_ALBUM_NAME, "").trim());
+                    }
+
+                    mBuilder.setContentInfo(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").trim());
+                    notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         new AsyncTask<Void, Void, Void>() {
-            Bitmap theBitmap;
 
             @Override
             protected Void doInBackground(Void... voids) {

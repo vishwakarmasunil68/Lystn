@@ -18,8 +18,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.sundroid.lystn.R;
-import com.sundroid.lystn.adapter.SearchResultAdapter;
+import com.sundroid.lystn.activity.HomeActivity;
+import com.sundroid.lystn.adapter.DownloadListAdapter;
 import com.sundroid.lystn.fragmentcontroller.FragmentController;
+import com.sundroid.lystn.pojo.home.HomeContentPOJO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +32,10 @@ public class DownloadListFragment extends FragmentController {
 
     @BindView(R.id.rv_list)
     RecyclerView rv_list;
-    @BindView(R.id.iv_download)
-    ImageView iv_download;
+    @BindView(R.id.iv_delete)
+    ImageView iv_delete;
+    @BindView(R.id.iv_back)
+    ImageView iv_back;
 
     @Nullable
     @Override
@@ -45,32 +49,46 @@ public class DownloadListFragment extends FragmentController {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        downloadPojos.add("");
-        downloadPojos.add("");
-        downloadPojos.add("");
-        downloadPojos.add("");
-        downloadPojos.add("");
-        downloadPojos.add("");
-        downloadPojos.add("");
+        if(getActivity() instanceof HomeActivity){
+            HomeActivity homeActivity= (HomeActivity) getActivity();
+            downloadPojos.addAll(homeActivity.getDbManager().readAllSongs());
+        }
+
         attachGenericAdapter(rv_list);
 
-        iv_download.setOnClickListener(new View.OnClickListener() {
+        iv_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDeleteDialog();
             }
         });
 
+        iv_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
     }
 
-    List<String> downloadPojos=new ArrayList<>();
+    public void deleteSong(boolean show){
+        if(show){
+            iv_delete.setVisibility(View.VISIBLE);
+        }else{
+            iv_delete.setVisibility(View.GONE);
+        }
+    }
+
+    List<HomeContentPOJO> downloadPojos=new ArrayList<>();
+    DownloadListAdapter downloadListAdapter;
 
     public void attachGenericAdapter(RecyclerView rv) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rv.setHasFixedSize(true);
         rv.setLayoutManager(linearLayoutManager);
-        SearchResultAdapter searchResultAdapter = new SearchResultAdapter(getActivity(), this, downloadPojos);
-        rv.setAdapter(searchResultAdapter);
+        downloadListAdapter = new DownloadListAdapter(getActivity(), this, downloadPojos);
+        rv.setAdapter(downloadListAdapter);
         rv.setNestedScrollingEnabled(false);
         rv.setItemAnimator(new DefaultItemAnimator());
     }
@@ -103,8 +121,24 @@ public class DownloadListFragment extends FragmentController {
             @Override
             public void onClick(View v) {
                 dialog1.dismiss();
+                deleteSongs();
 //                dialogShutDown(is_stop);
             }
         });
     }
+
+    public void deleteSongs(){
+        if(getActivity() instanceof HomeActivity){
+            HomeActivity homeActivity= (HomeActivity) getActivity();
+            for(int i=0;i<downloadPojos.size();i++){
+                HomeContentPOJO homeContentPOJO=downloadPojos.get(i);
+                if(homeActivity.getDbManager().removeSong(homeContentPOJO.getConId())){
+                    downloadPojos.remove(i);
+                }
+            }
+        }
+        downloadListAdapter.notifyDataSetChanged();
+    }
+
+
 }

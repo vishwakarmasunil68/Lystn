@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -45,15 +46,16 @@ import com.sundroid.lystn.fragment.playlist.PlayListFragment;
 import com.sundroid.lystn.fragmentcontroller.ActivityManager;
 import com.sundroid.lystn.pojo.artiste.ArtisteDetailPOJO;
 import com.sundroid.lystn.pojo.artiste.PodcastDetailPOJO;
+import com.sundroid.lystn.pojo.artiste.PodcastEpisodeDetailsPOJO;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
 import com.sundroid.lystn.pojo.home.HomePOJO;
 import com.sundroid.lystn.service.DownloadSongService;
 import com.sundroid.lystn.service.MediaService;
+import com.sundroid.lystn.util.DbManager;
 import com.sundroid.lystn.util.Pref;
 import com.sundroid.lystn.util.StringUtils;
 import com.sundroid.lystn.util.TagUtils;
 import com.sundroid.lystn.util.ToastClass;
-import com.sundroid.lystn.util.UtilityFunction;
 import com.sundroid.lystn.webservice.ApiCallBase;
 import com.sundroid.lystn.webservice.WebServicesCallBack;
 import com.sundroid.lystn.webservice.WebServicesUrls;
@@ -62,13 +64,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import p32929.androideasysql_library.Column;
+import p32929.androideasysql_library.EasyDB;
 
 public class HomeActivity extends ActivityManager implements View.OnClickListener {
 
@@ -125,6 +128,8 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
     List<String> artisteFollowUpList = new ArrayList<>();
     List<String> genreFollowUpList = new ArrayList<>();
 
+    DbManager dbManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,6 +147,9 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         maketranslucentStatusBar();
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
+
+
+        dbManager = DbManager.initDB(getApplicationContext());
 
         linearLayouts.add(ll_home);
         linearLayouts.add(ll_search);
@@ -173,25 +181,59 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
 
         checkUserProfileLoaded();
 
-        String appDir = UtilityFunction.getAppDirectory(getApplicationContext());
-        UtilityFunction.createAppSongDir(getApplicationContext());
-        listAllFiles(appDir);
+//        String appDir = UtilityFunction.getAppDirectory(getApplicationContext());
+//        UtilityFunction.createAppSongDir(getApplicationContext());
+//        listAllFiles(appDir);
 
+
+//        initDB();
 
     }
 
+    public DbManager getDbManager() {
+        return dbManager;
+    }
 
-    public void listAllFiles(String file_path) {
-        File file = new File(file_path);
-        if (file.exists()) {
-            String[] files = file.list();
-            Log.d(TagUtils.getTag(), "files length:-" + files.length);
-            for (String f : files) {
-                Log.d(TagUtils.getTag(), "inner file:-" + f);
-            }
+    public void initDB() {
+        //type:-  podcast song =1
+        EasyDB easyDB = EasyDB.init(this, "Lystn") // "TEST" is the name of the DATABASE
+                .setTableName("downloads")  // You can ignore this line if you want
+//                .addColumn(new Column("id", new String[]{"text", "unique"}))
+                .addColumn(new Column("type", new String[]{"text", "not null"}))
+                .addColumn(new Column("pojo", new String[]{"text"}))
+                .doneTableColumn();
+
+        addsong();
+    }
+
+    public void addsong() {
+        EasyDB easyDB = EasyDB.init(this, "Lystn").setTableName("downloads");
+        boolean done = easyDB
+                .addData("type", "adding data")
+                .addData("pojo", "casdcsdac")
+                .doneDataAdding();
+
+        readAllData();
+    }
+
+    public void readAllData() {
+        EasyDB easyDB = EasyDB.init(this, "Lystn").setTableName("downloads");
+        Cursor res = easyDB.getAllData();
+        while (res.moveToNext()) {
+            Log.d(TagUtils.getTag(), "data reading:- col1:-" + res.getString(0) + ",col2:-" + res.getString(1) + ",col3:-" + res.getString(2));
         }
     }
 
+//    public void listAllFiles(String file_path) {
+//        File file = new File(file_path);
+//        if (file.exists()) {
+//            String[] files = file.list();
+//            Log.d(TagUtils.getTag(), "files length:-" + files.length);
+//            for (String f : files) {
+//                Log.d(TagUtils.getTag(), "inner file:-" + f);
+//            }
+//        }
+//    }
 
     public void checkUserProfileLoaded() {
 
@@ -288,16 +330,17 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
+
+        if (fragmentList.size() > 0) {
+            for (int i = 0; i < fragmentList.size(); i++) {
+                onBackPressed();
+            }
+        }
         switch (v.getId()) {
             case R.id.ll_home:
                 viewPager.setCurrentItem(0);
                 break;
             case R.id.ll_search:
-                if (fragmentList.size() > 0) {
-                    for (int i = 0; i < fragmentList.size(); i++) {
-                        onBackPressed();
-                    }
-                }
                 viewPager.setCurrentItem(1);
                 break;
             case R.id.ll_update:
@@ -522,6 +565,10 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
                     updateTimings(intent.getIntExtra(StringUtils.CURRENT_MEDIA_TIME, 0), intent.getIntExtra(StringUtils.MEDIA_DURATION, 0));
                 } else if (type.equalsIgnoreCase(StringUtils.PLAY_COMPLETED)) {
                     nextSong();
+                } else if (type.equalsIgnoreCase(StringUtils.SAVE_SONG_DB)) {
+                    String podcast_id = intent.getStringExtra("podcast_id");
+                    PodcastEpisodeDetailsPOJO podcastEpisodeDetailsPOJO = (PodcastEpisodeDetailsPOJO) intent.getSerializableExtra("pojo");
+                    dbManager.saveDownloadedSong(podcast_id, "podcast", new Gson().toJson(podcastEpisodeDetailsPOJO));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -618,7 +665,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
             @Override
             public void onGetMsg(String apicall, String response) {
                 dismissProgressBar();
-                homeContentPOJOS.clear();
+//                homeContentPOJOS.clear();
                 try {
                     String object = new String(response);
                     JSONObject jsonObject = new JSONObject(object);
@@ -655,6 +702,23 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         startFragment(R.id.frame_main, new GenreDetailFragment(conId));
     }
 
+    public void setHomeContentPOJOS(List<HomeContentPOJO> homeContentPOJOS) {
+
+        if (homeContentPOJOS != null && homeContentPOJOS.size() > 0 && playingPosition != -1) {
+
+            String playing_id=homeContentPOJOS.get(playingPosition).getConId();
+
+            this.homeContentPOJOS.clear();
+            this.homeContentPOJOS.addAll(homeContentPOJOS);
+
+            for (int i = 0; i < homeContentPOJOS.size(); i++) {
+                if (homeContentPOJOS.get(i).getConId().equalsIgnoreCase(playing_id)) {
+                    this.playingPosition = i;
+                }
+            }
+        }
+    }
+
 
     public void getUserProfile() {
         JSONObject jsonObject = new JSONObject();
@@ -672,7 +736,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
             @Override
             public void onGetMsg(String apicall, String response) {
                 dismissProgressBar();
-                homeContentPOJOS.clear();
+//                homeContentPOJOS.clear();
                 try {
                     String object = new String(response);
                     JSONObject jsonObject = new JSONObject(object);
@@ -912,11 +976,41 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         return min + " : " + sec;
     }
 
-    public void downloadSong(String conID, String url) {
-        Log.d(TagUtils.getTag(),"downloading song");
+    //episode_id,uri,title
+
+    public void downloadSong(HomeContentPOJO homeContentPOJO) {
+
+        PodcastEpisodeDetailsPOJO podcastEpisodeDetailsPOJO = new PodcastEpisodeDetailsPOJO();
+        podcastEpisodeDetailsPOJO.setEpisodeId(homeContentPOJO.getConId());
+        podcastEpisodeDetailsPOJO.setStreamUri(homeContentPOJO.getCotDeepLink());
+        podcastEpisodeDetailsPOJO.setDescription(homeContentPOJO.getDescription());
+        podcastEpisodeDetailsPOJO.setTitle(homeContentPOJO.getConName());
+        podcastEpisodeDetailsPOJO.setImgLocalUri(homeContentPOJO.getImgIrl());
+        podcastEpisodeDetailsPOJO.setImgRemoteUri(homeContentPOJO.getImgIrl());
+
+        Log.d(TagUtils.getTag(), "downloading song");
         Intent serviceIntent = new Intent(HomeActivity.this, DownloadSongService.class);
-        serviceIntent.putExtra("conId", conID);
-        serviceIntent.putExtra("url", url);
+        serviceIntent.putExtra("type", "podcast");
+        serviceIntent.putExtra("podcast_episode", podcastEpisodeDetailsPOJO);
         startService(serviceIntent);
+    }
+
+    public void downloadSong(PodcastEpisodeDetailsPOJO podcastEpisodeDetailsPOJO) {
+        Log.d(TagUtils.getTag(), "downloading song");
+        Intent serviceIntent = new Intent(HomeActivity.this, DownloadSongService.class);
+        serviceIntent.putExtra("type", "podcast");
+        serviceIntent.putExtra("podcast_episode", podcastEpisodeDetailsPOJO);
+        startService(serviceIntent);
+    }
+
+    public void addsong(String type, String pojo) {
+        EasyDB easyDB = EasyDB.init(this, "Lystn").setTableName("downloads");
+//        easyDB.deleteAllDataFromTable();
+        boolean done = easyDB
+                .addData("type", type)
+                .addData("pojo", pojo)
+                .doneDataAdding();
+
+        readAllData();
     }
 }

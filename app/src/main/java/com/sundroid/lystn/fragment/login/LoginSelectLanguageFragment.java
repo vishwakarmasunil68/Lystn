@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -31,8 +31,8 @@ public class LoginSelectLanguageFragment extends FragmentController {
 
     @BindView(R.id.rv_select_language)
     RecyclerView rv_select_language;
-    @BindView(R.id.frame_continue)
-    FrameLayout frame_continue;
+    @BindView(R.id.iv_continue)
+    ImageView iv_continue;
     @BindView(R.id.tv_skip)
     TextView tv_skip;
 
@@ -69,7 +69,7 @@ public class LoginSelectLanguageFragment extends FragmentController {
             }
         });
 
-        frame_continue.setOnClickListener(new View.OnClickListener() {
+        iv_continue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(checkSelected()==-1){
@@ -93,6 +93,20 @@ public class LoginSelectLanguageFragment extends FragmentController {
             }
         }
         return -1;
+    }
+
+    public void checkContinueVisibility(){
+        boolean is_selected=false;
+        for(LanguagePOJO languagePOJO:languagePOJOS){
+            if(languagePOJO.isSelected()){
+                is_selected=true;
+            }
+        }
+        if(is_selected){
+            iv_continue.setImageResource(R.drawable.ic_continue_btn_enabled);
+        }else{
+            iv_continue.setImageResource(R.drawable.ic_continue_btn_disabled);
+        }
     }
 
     LanguageSelectAdapter languageSelectAdapter;

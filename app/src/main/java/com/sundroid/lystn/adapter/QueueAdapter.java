@@ -14,8 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.sundroid.lystn.R;
+import com.sundroid.lystn.activity.HomeActivity;
 import com.sundroid.lystn.fragment.home.MusicPlayerFragment;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
+import com.sundroid.lystn.util.Pref;
+import com.sundroid.lystn.util.StringUtils;
 
 import java.util.List;
 
@@ -53,6 +56,20 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
 
         holder.tv_title.setText(items.get(position).getConName().trim());
 
+        if(Pref.GetStringPref(activity.getApplicationContext(), StringUtils.MEDIA_TYPE, "").equalsIgnoreCase("radio")){
+            holder.iv_download.setVisibility(View.GONE);
+        }else{
+//            holder.iv_download.setVisibility(View.VISIBLE);
+            if (activity instanceof HomeActivity) {
+                HomeActivity homeActivity = (HomeActivity) activity;
+                if (homeActivity.getDbManager().checkSongInDB(items.get(position).getConId())) {
+                    holder.iv_download.setVisibility(View.GONE);
+                } else {
+                    holder.iv_download.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,6 +81,20 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
                     MusicPlayerFragment musicPlayerFragment = (MusicPlayerFragment) fragment;
                     musicPlayerFragment.playQueueSelectedSong(position);
                 }
+            }
+        });
+
+
+
+        holder.iv_download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (activity instanceof HomeActivity) {
+                    HomeActivity homeActivity = (HomeActivity) activity;
+//                    homeActivity.downloadSong(items.get(position).getEpisodeId(), items.get(position).getStreamUri());
+                    homeActivity.downloadSong(items.get(position));
+                }
+                holder.iv_download.setVisibility(View.GONE);
             }
         });
 

@@ -477,29 +477,41 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"></androidx.recyclerview.widget.RecyclerView>
 
-            <LinearLayout
+
+            <ImageView
+                android:id="@+id/iv_continue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center"
-                android:padding="15dp"
-                android:gravity="center">
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_continue_btn_disabled"/>
 
-                <TextView
-                    android:id="@+id/tv_tags"
-                    android:layout_width="wrap_content"
-                    android:visibility="gone"
-                    android:layout_height="wrap_content"/>
 
-                <ImageView
-                    android:id="@+id/iv_login_mobile"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:adjustViewBounds="true"
-                    android:layout_marginTop="10dp"
-                    android:src="@drawable/login_continue"/>
+            <!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="vertical"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:padding="15dp"-->
+<!--                android:gravity="center">-->
 
-            </LinearLayout>
+<!--                <TextView-->
+<!--                    android:id="@+id/tv_tags"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:visibility="gone"-->
+<!--                    android:layout_height="wrap_content"/>-->
+
+<!--                <ImageView-->
+<!--                    android:id="@+id/iv_login_mobile"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:adjustViewBounds="true"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:src="@drawable/login_continue"/>-->
+
+<!--            </LinearLayout>-->
 
         </LinearLayout>
 

@@ -135,6 +135,14 @@ public class LoginActivity extends ActivityManager {
         request.executeAsync();
     }
 
+//    @Override
+//    public void onBackPressed() {
+//        if(fragmentList.size()==0){
+//
+//        }
+//        super.onBackPressed();
+//    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         callbackManager.onActivityResult(requestCode, resultCode, data);

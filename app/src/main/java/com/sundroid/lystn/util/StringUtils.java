@@ -44,4 +44,10 @@ public class StringUtils {
     public static String PREVIOUS_SONG="PREVIOUS_SONG";
     public static String NOTIFICAION_ALBUM_NAME="NOTIFICAION_ALBUM_NAME";
     public static String DISMISS_PROGRESS_BAR="DISMISS_PROGRESS_BAR";
+
+
+    public static String SAVE_SONG_DB="SAVE_SONG_DB";
+    public static String DOWNLOAD_SONG_TYPE="DOWNLOAD_SONG_TYPE";
+
+
 }

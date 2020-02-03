@@ -39,14 +39,14 @@ import butterknife.BindView;
 
 public class LoginTagFragment extends FragmentController {
 
-    @BindView(R.id.iv_login_mobile)
-    ImageView iv_login_mobile;
+//    @BindView(R.id.iv_login_mobile)
+//    ImageView iv_login_mobile;
     @BindView(R.id.tv_skip)
     TextView tv_skip;
     @BindView(R.id.rv_genre_category)
     RecyclerView rv_genre_category;
-    @BindView(R.id.tv_tags)
-    TextView tv_tags;
+    @BindView(R.id.iv_continue)
+    ImageView iv_continue;
 
     List<CategoryTagPOJO> categoryTagPOJOS=new ArrayList<>();
 
@@ -62,7 +62,7 @@ public class LoginTagFragment extends FragmentController {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        iv_login_mobile.setOnClickListener(new View.OnClickListener() {
+        iv_continue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(isValid()){
@@ -153,6 +153,20 @@ public class LoginTagFragment extends FragmentController {
         rv_genre_category.setAdapter(genreCategoryAdapter);
     }
 
+    public void continueBtnEnabling(){
+        boolean is_active=false;
+        for(CategoryTagPOJO categoryTagPOJO:categoryTagPOJOS){
+            if(categoryTagPOJO.isActive()){
+                is_active=true;
+            }
+        }
+
+        if(is_active){
+            iv_continue.setImageResource(R.drawable.ic_continue_btn_enabled);
+        }else{
+            iv_continue.setImageResource(R.drawable.ic_continue_btn_disabled);
+        }
+    }
 
     public void postGenre() {
 

@@ -216,7 +216,7 @@
                 android:layout_marginTop="10dp"
                 android:adjustViewBounds="true"
                 android:enabled="false"
-                android:src="@drawable/ic_signin_disabled" />
+                android:src="@drawable/ic_signin_num_disabled" />
 
         </LinearLayout>
 

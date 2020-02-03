@@ -25,8 +25,8 @@
 
             <ImageView
                 android:id="@+id/iv_back"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginLeft="16dp"
                 android:src="@drawable/ic_back" />
         </LinearLayout>
@@ -123,7 +123,7 @@
                     android:layout_height="28dp"
                     android:layout_gravity="right|bottom"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/ic_favorite" />
+                    android:src="@drawable/ic_follow_new" />
 
             </FrameLayout>
 
@@ -210,7 +210,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Playlists"
+                android:text="Episodes"
                 android:textColor="#000000"
                 android:textSize="17sp" />
 
@@ -238,7 +238,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Recommend"
+                android:text="Similar Podcasts"
                 android:textColor="#000000"
                 android:textSize="17sp" />
 
@@ -269,7 +269,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:text="Phases"
+                android:text="Episodes"
                 android:textSize="13sp" />
 
         </LinearLayout>
@@ -297,6 +297,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/ll_sorting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

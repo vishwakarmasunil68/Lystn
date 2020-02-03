@@ -61,6 +61,8 @@ public class MusicPlayerFragment extends FragmentController {
     LinearLayout ll_minimize;
     @BindView(R.id.iv_next)
     ImageView iv_next;
+    @BindView(R.id.iv_previous)
+    ImageView iv_previous;
     @BindView(R.id.ll_queue)
     LinearLayout ll_queue;
     @BindView(R.id.iv_player_background)
@@ -219,17 +221,17 @@ public class MusicPlayerFragment extends FragmentController {
             }
         });
 
-//        iv_previous.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (!Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.MEDIA_TYPE, "").equals("radio")) {
-//                    if (getActivity() instanceof HomeActivity) {
-//                        HomeActivity homeActivity = (HomeActivity) getActivity();
-//                        homeActivity.previousSong();
-//                    }
-//                }
-//            }
-//        });
+        iv_previous.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.MEDIA_TYPE, "").equals("radio")) {
+                    if (getActivity() instanceof HomeActivity) {
+                        HomeActivity homeActivity = (HomeActivity) getActivity();
+                        homeActivity.previousSong();
+                    }
+                }
+            }
+        });
 
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -387,7 +389,7 @@ public class MusicPlayerFragment extends FragmentController {
         homeContentPOJOS.get(position).setPlaying(true);
 
         Glide.with(this).load(homeContentPOJOS.get(position).getImgIrl())
-                .apply(RequestOptions.bitmapTransform(new BlurTransformation(50, 5)))
+                .apply(RequestOptions.bitmapTransform(new BlurTransformation(25, 5)))
                 .into(iv_player_background);
 
 //        Glide.with(getActivity()).load(homeContentPOJO.getImgIrl())
@@ -408,7 +410,19 @@ public class MusicPlayerFragment extends FragmentController {
             ll_next.setVisibility(View.GONE);
             ll_previous.setVisibility(View.GONE);
         } else {
-            ic_download.setVisibility(View.VISIBLE);
+            if (Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.MEDIA_TYPE, "").equalsIgnoreCase("download")) {
+                ic_download.setVisibility(View.GONE);
+            } else {
+                if (getActivity() instanceof HomeActivity) {
+                    HomeActivity homeActivity = (HomeActivity) getActivity();
+                    if (homeActivity.getDbManager().checkSongInDB(homeContentPOJOS.get(position).getConId())) {
+                        ic_download.setVisibility(View.GONE);
+                    } else {
+                        ic_download.setVisibility(View.VISIBLE);
+                    }
+                }
+//                ic_download.setVisibility(View.VISIBLE);
+            }
             ll_seekBar.setVisibility(View.VISIBLE);
             ll_next.setVisibility(View.VISIBLE);
             ll_previous.setVisibility(View.VISIBLE);
@@ -512,7 +526,7 @@ public class MusicPlayerFragment extends FragmentController {
         seekBar.setMax(media_duration);
         seekBar.setProgress(current_time);
         String minSec = getMinSec(current_time);
-        Log.d(TagUtils.getTag(),"min sec:-"+minSec);
+        Log.d(TagUtils.getTag(), "min sec:-" + minSec);
         tv_current_time.setText(minSec);
         tv_total_duration.setText(getMinSec(media_duration));
     }
