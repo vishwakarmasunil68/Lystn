@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.sundroid.lystn.R;
+import com.sundroid.lystn.activity.HomeActivity;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
 
 import java.util.List;
@@ -83,6 +84,16 @@ public class CategoryPillsAdapter extends RecyclerView.Adapter<CategoryPillsAdap
                 .into(holder.iv_item);
 
         holder.tv_cat.setText(items.get(position).getConName());
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (activity instanceof HomeActivity) {
+                    HomeActivity homeActivity = (HomeActivity) activity;
+                    homeActivity.openCategoryPodcastFragment(items.get(position).getConId(), items.get(position).getConName());
+                }
+            }
+        });
 
         holder.itemView.setTag(items.get(position));
     }

@@ -81,7 +81,7 @@ public class HomeCircleAdapter extends RecyclerView.Adapter<HomeCircleAdapter.Vi
                 if(type.equalsIgnoreCase("genre")){
                     if(activity instanceof HomeActivity){
                         HomeActivity homeActivity= (HomeActivity) activity;
-                        homeActivity.startPodcastFragment(items.get(position).getConId());
+                        homeActivity.startGenreDetailFragment(items.get(position).getConId());
                     }
                 }else if(type.equalsIgnoreCase("radio")){
                     if(activity instanceof HomeActivity){

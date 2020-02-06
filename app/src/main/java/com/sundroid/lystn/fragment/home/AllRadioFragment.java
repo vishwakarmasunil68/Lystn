@@ -189,6 +189,7 @@ public class AllRadioFragment extends FragmentController {
 
             @Override
             public void onErrorMsg(String status_code, String response) {
+                ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
                 dismissProgressBar();
             }
         }, "GET_HOME_CONTENT").makeApiCall(WebServicesUrls.GET_SEE_ALL_BUCKET, jsonObject);

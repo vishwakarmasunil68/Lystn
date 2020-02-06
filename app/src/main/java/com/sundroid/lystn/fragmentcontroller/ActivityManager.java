@@ -2,7 +2,6 @@ package com.sundroid.lystn.fragmentcontroller;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -12,7 +11,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.sundroid.lystn.progress.ProgressHUD;
-import com.sundroid.lystn.util.TagUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,8 +97,10 @@ public class ActivityManager extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        fragmentList.remove(fragmentList.size()-1);
+        if(fragmentList.size()>0) {
+            fragmentList.remove(fragmentList.size() - 1);
+        }
         super.onBackPressed();
-        Log.d(TagUtils.getTag(),"fragments size:-"+fragmentList.size());
+//        Log.d(TagUtils.getTag(),"fragments size:-"+fragmentList.size());
     }
 }

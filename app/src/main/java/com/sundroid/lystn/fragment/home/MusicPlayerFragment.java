@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,19 +26,25 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.sundroid.lystn.R;
 import com.sundroid.lystn.activity.HomeActivity;
 import com.sundroid.lystn.adapter.QueueAdapter;
+import com.sundroid.lystn.adapter.RecommentRVAdapter;
 import com.sundroid.lystn.fragmentcontroller.FragmentController;
 import com.sundroid.lystn.pojo.artiste.PodcastDetailPOJO;
+import com.sundroid.lystn.pojo.artiste.PodcastEpisodeDetailsPOJO;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
 import com.sundroid.lystn.util.Pref;
 import com.sundroid.lystn.util.StringUtils;
 import com.sundroid.lystn.util.TagUtils;
+import com.sundroid.lystn.util.ToastClass;
 import com.sundroid.lystn.webservice.ApiCallBase;
+import com.sundroid.lystn.webservice.DownloadCallback;
+import com.sundroid.lystn.webservice.DownloadSongManager;
 import com.sundroid.lystn.webservice.WebServicesCallBack;
 import com.sundroid.lystn.webservice.WebServicesUrls;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -83,8 +88,8 @@ public class MusicPlayerFragment extends FragmentController {
     TextView tv_podcast_copy_right;
     @BindView(R.id.cv_podcast)
     CardView cv_podcast;
-    @BindView(R.id.btn_follow)
-    Button btn_follow;
+    @BindView(R.id.iv_favorited)
+    ImageView iv_favorited;
     @BindView(R.id.ll_seekBar)
     LinearLayout ll_seekBar;
     @BindView(R.id.ll_previous)
@@ -99,12 +104,14 @@ public class MusicPlayerFragment extends FragmentController {
     FrameLayout frame_bottom_sheet;
     @BindView(R.id.frame_rv)
     FrameLayout frame_rv;
-    @BindView(R.id.frame_podcast)
-    FrameLayout frame_podcast;
     @BindView(R.id.iv_seek_forward)
     ImageView iv_seek_forward;
     @BindView(R.id.layout_content)
     View layout_content;
+    @BindView(R.id.frame_drag)
+    FrameLayout frame_drag;
+    @BindView(R.id.rv_recommend)
+    RecyclerView rv_recommend;
     BottomSheetBehavior bottomSheetBehavior;
 
     PodcastDetailPOJO podcastDetailPOJO;
@@ -112,11 +119,13 @@ public class MusicPlayerFragment extends FragmentController {
     int position;
 
     boolean onRVTouch = false;
+    boolean openQueue = false;
 
-    public MusicPlayerFragment(List<HomeContentPOJO> homeContentPOJOS, int position, PodcastDetailPOJO podcastDetailPOJO) {
+    public MusicPlayerFragment(List<HomeContentPOJO> homeContentPOJOS, int position, PodcastDetailPOJO podcastDetailPOJO, boolean openQueue) {
         this.homeContentPOJOS = homeContentPOJOS;
         this.position = position;
         this.podcastDetailPOJO = podcastDetailPOJO;
+        this.openQueue = openQueue;
 //        Log.d(TagUtils.getTag(),"homecontentpojos:-"+homeContentPOJOS.size());
     }
 
@@ -164,12 +173,7 @@ public class MusicPlayerFragment extends FragmentController {
         ll_queue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TagUtils.getTag(), "queue clicked");
-                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                } else {
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                }
+                queueLogic();
             }
         });
 
@@ -256,7 +260,11 @@ public class MusicPlayerFragment extends FragmentController {
             }
         });
 
-        btn_follow.setOnClickListener(new View.OnClickListener() {
+        if (podcastDetailPOJO != null) {
+            changeFollowText(String.valueOf(podcastDetailPOJO.getPodcastId()));
+        }
+
+        iv_favorited.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (podcastDetailPOJO != null) {
@@ -297,7 +305,8 @@ public class MusicPlayerFragment extends FragmentController {
 
                                 @Override
                                 public void onErrorMsg(String status_code, String response) {
-
+                                    homeActivity.dismissProgressBar();
+                                    ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
                                 }
                             }, "UNFOLLOW_API").makeApiCall(WebServicesUrls.UNFOLLOW_API, jsonObject);
                         } else {
@@ -338,7 +347,8 @@ public class MusicPlayerFragment extends FragmentController {
 
                                 @Override
                                 public void onErrorMsg(String status_code, String response) {
-
+                                    ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
+                                    homeActivity.dismissProgressBar();
                                 }
                             }, "FOLLOW_API").makeApiCall(WebServicesUrls.FOLLOW_API, jsonObject);
                         }
@@ -346,17 +356,61 @@ public class MusicPlayerFragment extends FragmentController {
                 }
             }
         });
+        attachRecommendAdapter();
+    }
+
+    public void queueLogic() {
+        Log.d(TagUtils.getTag(), "queue clicked");
+        if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        } else {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
+    }
+
+    public void openQueue() {
+        Log.d(TagUtils.getTag(), "queue clicked");
+        if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+        } else {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
+    }
+
+    public void attachRecommendAdapter() {
+
+        List<String> recommend = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            recommend.add("");
+        }
+
+        LinearLayoutManager gridLayoutManager = new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false);
+        rv_recommend.setHasFixedSize(true);
+        rv_recommend.setLayoutManager(gridLayoutManager);
+        RecommentRVAdapter homeArtistesAdapter = new RecommentRVAdapter(getActivity(), this, recommend);
+        rv_recommend.setAdapter(homeArtistesAdapter);
+        rv_recommend.setNestedScrollingEnabled(false);
+        rv_recommend.setItemAnimator(new DefaultItemAnimator());
     }
 
     public void changeFollowText(String conId) {
         if (getActivity() instanceof HomeActivity) {
             HomeActivity homeActivity = (HomeActivity) getActivity();
             if (homeActivity.getArtisteFollowUpList().contains(conId)) {
-                btn_follow.setText("Unfollow");
+                iv_favorited.setImageResource(R.drawable.ic_following_new);
             } else {
-                btn_follow.setText("Follow");
+                iv_favorited.setImageResource(R.drawable.ic_follow_new);
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (getActivity() instanceof HomeActivity) {
+            HomeActivity homeActivity = (HomeActivity) getActivity();
+            homeActivity.onMusicPlayerClosed();
+        }
+        super.onBackPressed();
+//        Log.d(TagUtils.getTag(),"Music player back");
     }
 
     @Override
@@ -367,10 +421,7 @@ public class MusicPlayerFragment extends FragmentController {
 
     @Override
     public void onDestroy() {
-        if (getActivity() instanceof HomeActivity) {
-            HomeActivity homeActivity = (HomeActivity) getActivity();
-            homeActivity.onMusicPlayerClosed();
-        }
+
         super.onDestroy();
     }
 
@@ -400,15 +451,19 @@ public class MusicPlayerFragment extends FragmentController {
 
         if (homeContentPOJOS.get(position).getDescription() != null && !(homeContentPOJOS.get(position).getDescription().equalsIgnoreCase(""))) {
             tv_description.setText(homeContentPOJOS.get(position).getDescription());
+            tv_description.setVisibility(View.VISIBLE);
         } else {
             tv_description.setText("");
+            tv_description.setVisibility(View.GONE);
         }
 
         if (Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.MEDIA_TYPE, "").equalsIgnoreCase("radio")) {
             ic_download.setVisibility(View.GONE);
             ll_seekBar.setVisibility(View.GONE);
             ll_next.setVisibility(View.GONE);
+            frame_drag.setVisibility(View.GONE);
             ll_previous.setVisibility(View.GONE);
+            ll_queue.setVisibility(View.GONE);
         } else {
             if (Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.MEDIA_TYPE, "").equalsIgnoreCase("download")) {
                 ic_download.setVisibility(View.GONE);
@@ -423,17 +478,51 @@ public class MusicPlayerFragment extends FragmentController {
                 }
 //                ic_download.setVisibility(View.VISIBLE);
             }
+            frame_drag.setVisibility(View.VISIBLE);
             ll_seekBar.setVisibility(View.VISIBLE);
             ll_next.setVisibility(View.VISIBLE);
+            ll_queue.setVisibility(View.VISIBLE);
             ll_previous.setVisibility(View.VISIBLE);
         }
+
+        ic_download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (getActivity() instanceof HomeActivity) {
+                    HomeActivity homeActivity = (HomeActivity) getActivity();
+
+                    PodcastEpisodeDetailsPOJO podcastEpisodeDetailsPOJO = new PodcastEpisodeDetailsPOJO();
+                    podcastEpisodeDetailsPOJO.setEpisodeId(homeContentPOJOS.get(position).getConId());
+                    podcastEpisodeDetailsPOJO.setTitle(homeContentPOJOS.get(position).getConName());
+                    podcastEpisodeDetailsPOJO.setImgLocalUri(homeContentPOJOS.get(position).getImgIrl());
+                    podcastEpisodeDetailsPOJO.setImgRemoteUri(homeContentPOJOS.get(position).getImgIrl());
+                    podcastEpisodeDetailsPOJO.setDescription(homeContentPOJOS.get(position).getDescription());
+                    podcastEpisodeDetailsPOJO.setSubtitle(homeContentPOJOS.get(position).getSubtitle());
+
+                    new DownloadSongManager(getActivity().getApplicationContext(),
+                            homeActivity.getDbManager(),
+                            new DownloadCallback() {
+                                @Override
+                                public void onSuccessDownload(String podcast_id) {
+                                    Log.d(TagUtils.getTag(), "download complete:-" + podcast_id);
+                                    ic_download.setVisibility(View.GONE);
+                                }
+
+                                @Override
+                                public void onDownloadFailed(String error) {
+
+                                }
+                            }).downloadSong(podcastEpisodeDetailsPOJO, podcastDetailPOJO);
+                }
+            }
+        });
 
         if (getActivity() instanceof HomeActivity) {
             HomeActivity homeActivity = (HomeActivity) getActivity();
             homeActivity.checkPlayerRunning();
         }
         if (podcastDetailPOJO != null) {
-            frame_podcast.setVisibility(View.VISIBLE);
+            cv_podcast.setVisibility(View.VISIBLE);
             Glide.with(getActivity())
                     .load(podcastDetailPOJO.getImgLocalUri())
                     .placeholder(R.drawable.ll_square)
@@ -444,7 +533,7 @@ public class MusicPlayerFragment extends FragmentController {
             tv_podcast_name.setText(podcastDetailPOJO.getTitle());
             tv_podcast_copy_right.setText(podcastDetailPOJO.getCopyright());
         } else {
-            frame_podcast.setVisibility(View.INVISIBLE);
+            cv_podcast.setVisibility(View.GONE);
         }
         queueAdapter.notifyDataSetChanged();
 
@@ -511,6 +600,10 @@ public class MusicPlayerFragment extends FragmentController {
                 return false;
             }
         });
+
+        if(openQueue){
+            openQueue();
+        }
     }
 
     public void setPlayImage(boolean is_playing) {
@@ -526,7 +619,7 @@ public class MusicPlayerFragment extends FragmentController {
         seekBar.setMax(media_duration);
         seekBar.setProgress(current_time);
         String minSec = getMinSec(current_time);
-        Log.d(TagUtils.getTag(), "min sec:-" + minSec);
+//        Log.d(TagUtils.getTag(), "min sec:-" + minSec);
         tv_current_time.setText(minSec);
         tv_total_duration.setText(getMinSec(media_duration));
     }

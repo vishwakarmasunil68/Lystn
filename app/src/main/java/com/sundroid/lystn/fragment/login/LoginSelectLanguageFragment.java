@@ -63,8 +63,9 @@ public class LoginSelectLanguageFragment extends FragmentController {
             @Override
             public void onClick(View v) {
                 if(getActivity() instanceof LoginActivity){
+                    Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.LOGIN_LANGUAGE,true);
                     LoginActivity loginActivity= (LoginActivity) getActivity();
-                    loginActivity.skipFragment();
+                    loginActivity.startLoginDefaultFragment();
                 }
             }
         });
@@ -77,6 +78,7 @@ public class LoginSelectLanguageFragment extends FragmentController {
                 }else{
 //                    Pref.SetStringPref(getActivity(), StringUtils.USER_PREFER_LANGUAGE,languagePOJOS.get(checkSelected()).getLanguage_code());
                     Pref.SetStringPref(getActivity(), StringUtils.USER_PREFER_LANGUAGE,"en");
+                    Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.LOGIN_LANGUAGE,true);
                     if(getActivity() instanceof LoginActivity){
                         LoginActivity loginActivity= (LoginActivity) getActivity();
                         loginActivity.startLoginDefaultFragment();

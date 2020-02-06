@@ -7,7 +7,6 @@ import android.content.pm.Signature;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 
@@ -32,7 +31,7 @@ public class SplashActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_splash);
 
-        new CountDownTimer(3000,1000){
+        new CountDownTimer(3000, 1000) {
 
             @Override
             public void onTick(long millisUntilFinished) {
@@ -42,12 +41,28 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
 //                Crashlytics.getInstance().crash();
-                if(Pref.GetBooleanPref(getApplicationContext(), StringUtils.IS_LOGIN,false)){
-                    startActivity(new Intent(SplashActivity.this,HomeActivity.class));
+                if (Pref.GetBooleanPref(getApplicationContext(), StringUtils.IS_LOGIN, false)) {
+                    startActivity(new Intent(SplashActivity.this, HomeActivity.class));
                     finish();
-                }else{
-                    startActivity(new Intent(SplashActivity.this,WelcomeActivity.class));
-                    finish();
+                } else {
+                    Log.d(TagUtils.getTag(), "tag:-" + Pref.GetBooleanPref(getApplicationContext(), StringUtils.LOGIN_TAG, false));
+                    Log.d(TagUtils.getTag(), "main:-" + Pref.GetBooleanPref(getApplicationContext(), StringUtils.LOGIN_MAIN, false));
+                    Log.d(TagUtils.getTag(), "language:-" + Pref.GetBooleanPref(getApplicationContext(), StringUtils.LOGIN_LANGUAGE, false));
+                    Log.d(TagUtils.getTag(), "walkthrough:-" + Pref.GetBooleanPref(getApplicationContext(), StringUtils.WALKTHORUGH_SKIPPED, false));
+                    if (Pref.GetBooleanPref(getApplicationContext(), StringUtils.LOGIN_TAG, false)) {
+                        startActivity(new Intent(SplashActivity.this, HomeActivity.class));
+                        finish();
+                    } else if (Pref.GetBooleanPref(getApplicationContext(), StringUtils.LOGIN_MAIN, false)
+                            || Pref.GetBooleanPref(getApplicationContext(), StringUtils.LOGIN_LANGUAGE, false)
+                            || Pref.GetBooleanPref(getApplicationContext(), StringUtils.WALKTHORUGH_SKIPPED, false)) {
+                        startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+                        finish();
+                    } else {
+                        startActivity(new Intent(SplashActivity.this, WelcomeActivity.class));
+                        finish();
+                    }
+
+
                 }
 
             }
@@ -56,7 +71,7 @@ public class SplashActivity extends AppCompatActivity {
         getPackageInfo();
     }
 
-    public void getPackageInfo(){
+    public void getPackageInfo() {
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
                     "com.sundroid.lystn",
@@ -64,7 +79,7 @@ public class SplashActivity extends AppCompatActivity {
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
-                Log.d(TagUtils.getTag(),"Keyhash:-"+ Base64.encodeToString(md.digest(), Base64.DEFAULT));
+//                Log.d(TagUtils.getTag(),"Keyhash:-"+ Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
         } catch (PackageManager.NameNotFoundException e) {
 

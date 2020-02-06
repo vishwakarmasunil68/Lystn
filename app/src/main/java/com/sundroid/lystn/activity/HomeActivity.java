@@ -25,7 +25,9 @@ import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.sundroid.lystn.R;
 import com.sundroid.lystn.adapter.ViewPagerAdapter;
+import com.sundroid.lystn.fragment.category.HomeCateogryPodcastFragment;
 import com.sundroid.lystn.fragment.download.DownloadListFragment;
+import com.sundroid.lystn.fragment.download.PlayListFragment;
 import com.sundroid.lystn.fragment.home.AllArtistFragment;
 import com.sundroid.lystn.fragment.home.AllGenreFragment;
 import com.sundroid.lystn.fragment.home.AllRadioFragment;
@@ -42,8 +44,9 @@ import com.sundroid.lystn.fragment.home.MusicPlayerFragment;
 import com.sundroid.lystn.fragment.home.SearchFragment;
 import com.sundroid.lystn.fragment.home.UpdateFragment;
 import com.sundroid.lystn.fragment.login.LoginSelectLanguageFragment;
-import com.sundroid.lystn.fragment.playlist.PlayListFragment;
+import com.sundroid.lystn.fragment.profile.ProfileFragment;
 import com.sundroid.lystn.fragmentcontroller.ActivityManager;
+import com.sundroid.lystn.pojo.DownloadPOJO;
 import com.sundroid.lystn.pojo.artiste.ArtisteDetailPOJO;
 import com.sundroid.lystn.pojo.artiste.PodcastDetailPOJO;
 import com.sundroid.lystn.pojo.artiste.PodcastEpisodeDetailsPOJO;
@@ -52,6 +55,7 @@ import com.sundroid.lystn.pojo.home.HomePOJO;
 import com.sundroid.lystn.service.DownloadSongService;
 import com.sundroid.lystn.service.MediaService;
 import com.sundroid.lystn.util.DbManager;
+import com.sundroid.lystn.util.PlayListDbManager;
 import com.sundroid.lystn.util.Pref;
 import com.sundroid.lystn.util.StringUtils;
 import com.sundroid.lystn.util.TagUtils;
@@ -129,6 +133,9 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
     List<String> genreFollowUpList = new ArrayList<>();
 
     DbManager dbManager;
+    PlayListDbManager playListDbManager;
+
+    boolean is_registered = false;
 
 
     @Override
@@ -150,6 +157,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
 
 
         dbManager = DbManager.initDB(getApplicationContext());
+        playListDbManager = PlayListDbManager.initDB(getApplicationContext());
 
         linearLayouts.add(ll_home);
         linearLayouts.add(ll_search);
@@ -190,8 +198,13 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
 
     }
 
+
     public DbManager getDbManager() {
         return dbManager;
+    }
+
+    public PlayListDbManager getPlayListDbManager() {
+        return playListDbManager;
     }
 
     public void initDB() {
@@ -359,15 +372,16 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TagUtils.getTag(), "registering receiver");
-        getApplicationContext().registerReceiver(mMessageReceiver, new IntentFilter(StringUtils.UPDATE_HOME_ACTIVITY));
+        if (!is_registered) {
+            Log.d(TagUtils.getTag(), "registering receiver");
+            is_registered = true;
+            getApplicationContext().registerReceiver(mMessageReceiver, new IntentFilter(StringUtils.UPDATE_HOME_ACTIVITY));
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TagUtils.getTag(), "destroying receiver");
-        getApplicationContext().unregisterReceiver(mMessageReceiver);
     }
 
     public void startAllArtistFragment() {
@@ -393,10 +407,10 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
     MusicPlayerFragment musicPlayerFragment;
     PodcastDetailPOJO podcastDetailPOJO;
 
-    public void startMusicPlayerFragment() {
+    public void startMusicPlayerFragment(boolean openQueue) {
         if (homeContentPOJOS != null && homeContentPOJOS.size() > 0 && playingPosition != -1) {
             makeTransparentStatusBar();
-            startFragment(R.id.frame_home_activity, musicPlayerFragment = new MusicPlayerFragment(homeContentPOJOS, playingPosition, podcastDetailPOJO));
+            startFragment(R.id.frame_home_activity, musicPlayerFragment = new MusicPlayerFragment(homeContentPOJOS, playingPosition, podcastDetailPOJO, openQueue));
             new CountDownTimer(2000, 1000) {
 
                 public void onTick(long millisUntilFinished) {
@@ -480,10 +494,13 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         this.homeContentPOJOS.addAll(homeContentPOJOS);
         this.playingPosition = position;
         this.podcastDetailPOJO = podcastDetailPOJO;
+
+        playListDbManager.savePlayedSong(homeContentPOJOS.get(position).getConId(), "podcast", new Gson().toJson(homeContentPOJOS.get(position)), new Gson().toJson(podcastDetailPOJO));
+
         if (podcastDetailPOJO != null) {
             Pref.SetStringPref(getApplicationContext(), StringUtils.NOTIFICAION_ALBUM_NAME, podcastDetailPOJO.getTitle().trim());
         }
-        startMusicPlayerFragment();
+        startMusicPlayerFragment(false);
         startPlayer(this.homeContentPOJOS.get(playingPosition));
     }
 
@@ -548,7 +565,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         public void onReceive(Context context, Intent intent) {
             try {
                 String type = intent.getStringExtra("type");
-                Log.d(TagUtils.getTag(), "HomeType:-" + type);
+//                Log.d(TagUtils.getTag(), "HomeType:-" + type);
                 if (type.equalsIgnoreCase(StringUtils.DISMISS_PROGRESS_BAR)) {
                     dismissProgressBar();
                 } else if (type.equalsIgnoreCase(StringUtils.MUSIC_PLAYING_STATUS)) {
@@ -568,7 +585,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
                 } else if (type.equalsIgnoreCase(StringUtils.SAVE_SONG_DB)) {
                     String podcast_id = intent.getStringExtra("podcast_id");
                     PodcastEpisodeDetailsPOJO podcastEpisodeDetailsPOJO = (PodcastEpisodeDetailsPOJO) intent.getSerializableExtra("pojo");
-                    dbManager.saveDownloadedSong(podcast_id, "podcast", new Gson().toJson(podcastEpisodeDetailsPOJO));
+                    dbManager.saveDownloadedSong(podcastEpisodeDetailsPOJO.getEpisodeId(), "podcast", new Gson().toJson(podcastEpisodeDetailsPOJO), "");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -690,6 +707,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
             @Override
             public void onErrorMsg(String status_code, String response) {
                 dismissProgressBar();
+                ToastClass.showShortToast(getApplicationContext(),"Server Down");
             }
         }, "GET_HOME_CONTENT").makeApiCall(WebServicesUrls.GET_ARTIST_BUCKET, jsonObject);
     }
@@ -706,7 +724,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
 
         if (homeContentPOJOS != null && homeContentPOJOS.size() > 0 && playingPosition != -1) {
 
-            String playing_id=homeContentPOJOS.get(playingPosition).getConId();
+            String playing_id = homeContentPOJOS.get(playingPosition).getConId();
 
             this.homeContentPOJOS.clear();
             this.homeContentPOJOS.addAll(homeContentPOJOS);
@@ -788,6 +806,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
             @Override
             public void onErrorMsg(String status_code, String response) {
                 dismissProgressBar();
+                ToastClass.showShortToast(getApplicationContext(),"Server Down");
             }
         }, "GET_PROFILE").makeApiCall(WebServicesUrls.GET_PROFILE, jsonObject);
     }
@@ -798,6 +817,14 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
 
     public List<String> getGenreFollowUpList() {
         return genreFollowUpList;
+    }
+
+    public void setGenreFollowUpList(List<String> genreFollowUpList) {
+        this.genreFollowUpList = genreFollowUpList;
+    }
+
+    public void setArtisteFollowUpList(List<String> artisteFollowUpList) {
+        this.artisteFollowUpList = artisteFollowUpList;
     }
 
     public void addFollowUpData(String prefString, String followId) {
@@ -857,14 +884,24 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        is_registered = false;
+        Log.d(TagUtils.getTag(), "destroying receiver");
+        getApplicationContext().unregisterReceiver(mMessageReceiver);
+
         stopService(new Intent(HomeActivity.this, MediaService.class));
+        if (dbManager != null) {
+            dbManager.closeDB();
+        }
+        if (playListDbManager != null) {
+            playListDbManager.closeDB();
+        }
     }
 
     @Override
     public void onBackPressed() {
         if (fragmentList.size() == 0) {
             if (viewPager.getCurrentItem() == 0) {
-                super.onBackPressed();
+                this.moveTaskToBack(true);
             } else {
                 viewPager.setCurrentItem(0);
             }
@@ -873,13 +910,57 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         }
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Bundle bundle = intent.getExtras();
+
+        if (intent != null && intent.getAction() != null) {
+            if (intent.getAction().equals(MediaService.ACTION_SEEK)) {
+                seekMediaPlayer();
+            } else if (intent.getAction().equals(MediaService.ACTION_QUEUE)) {
+                MusicPlayerFragment musicPlayerFragment = getMusicPlayerFragment();
+                if (musicPlayerFragment != null) {
+                    musicPlayerFragment.openQueue();
+                } else {
+                    startMusicPlayerFragment(true);
+                }
+            }
+        }
+
+        if (bundle != null) {
+            for (String key : bundle.keySet()) {
+                Log.e(TagUtils.getTag(), key + " : " + (bundle.get(key) != null ? bundle.get(key) : "NULL"));
+            }
+        }
+    }
+
+    //    @Override
+//    protected void onNewIntent(Intent intent) {
+//        HomeActivity.this.finish();
+//
+//        // -----Start New Dashboard  when notification is clicked----
+//
+//        Intent i = new Intent(HomeActivity.this, HomeActivity.class);
+//
+//        startActivity(i);
+//
+//        super.onNewIntent(intent);
+//    }
+
     //    public void playEpisode(List<HomeContentPOJO> homeContentPOJOS, int index) {
 //        playAudio(homeContentPOJOS, index, "genre");
 //    }
 
+    public void seekMediaPlayer() {
+        Intent intent = new Intent(StringUtils.UPDATE_SERVICE);
+        intent.putExtra("type", StringUtils.SEEK_PLAYER_ACTIVITY);
+        sendBroadcast(intent);
+    }
+
     public void seekMediaPlayer(int progress) {
         Intent intent = new Intent(StringUtils.UPDATE_SERVICE);
-        intent.putExtra("type", StringUtils.SEEK_PLAYER);
+        intent.putExtra("type", StringUtils.SEEK_PLAYER_ACTIVITY);
         intent.putExtra(StringUtils.SEEK_PROGRESS, progress);
         sendBroadcast(intent);
     }
@@ -919,7 +1000,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
         ll_small_player.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startMusicPlayerFragment();
+                startMusicPlayerFragment(false);
             }
         });
 
@@ -990,6 +1071,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
 
         Log.d(TagUtils.getTag(), "downloading song");
         Intent serviceIntent = new Intent(HomeActivity.this, DownloadSongService.class);
+        serviceIntent.putExtra("download_type", "normal");
         serviceIntent.putExtra("type", "podcast");
         serviceIntent.putExtra("podcast_episode", podcastEpisodeDetailsPOJO);
         startService(serviceIntent);
@@ -998,6 +1080,7 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
     public void downloadSong(PodcastEpisodeDetailsPOJO podcastEpisodeDetailsPOJO) {
         Log.d(TagUtils.getTag(), "downloading song");
         Intent serviceIntent = new Intent(HomeActivity.this, DownloadSongService.class);
+        serviceIntent.putExtra("download_type", "normal");
         serviceIntent.putExtra("type", "podcast");
         serviceIntent.putExtra("podcast_episode", podcastEpisodeDetailsPOJO);
         startService(serviceIntent);
@@ -1013,4 +1096,24 @@ public class HomeActivity extends ActivityManager implements View.OnClickListene
 
         readAllData();
     }
+
+    public void downloadSong(DownloadPOJO downloadPOJO) {
+        Log.d(TagUtils.getTag(), "downloading song");
+        Intent serviceIntent = new Intent(HomeActivity.this, DownloadSongService.class);
+        serviceIntent.putExtra("download_type", "list");
+        serviceIntent.putExtra("type", "podcast");
+        serviceIntent.putExtra("downloadPOJO", downloadPOJO);
+        startService(serviceIntent);
+    }
+
+
+    public void openCategoryPodcastFragment(String conId, String name) {
+        startFragment(R.id.frame_main, new HomeCateogryPodcastFragment(conId, name));
+    }
+
+    public void startProfileFragment() {
+        startFragment(R.id.frame_main, new ProfileFragment());
+    }
+
+
 }

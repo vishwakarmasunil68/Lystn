@@ -18,6 +18,7 @@ import com.ixuea.android.downloader.callback.DownloadManager;
 import com.ixuea.android.downloader.domain.DownloadInfo;
 import com.ixuea.android.downloader.exception.DownloadException;
 import com.sundroid.lystn.R;
+import com.sundroid.lystn.pojo.DownloadPOJO;
 import com.sundroid.lystn.pojo.artiste.PodcastEpisodeDetailsPOJO;
 import com.sundroid.lystn.util.StringUtils;
 import com.sundroid.lystn.util.TagUtils;
@@ -25,6 +26,7 @@ import com.sundroid.lystn.util.ToastClass;
 import com.sundroid.lystn.util.UtilityFunction;
 
 import java.io.File;
+import java.util.List;
 
 import p32929.androideasysql_library.EasyDB;
 
@@ -35,10 +37,11 @@ public class DownloadSongService extends Service {
 //    String url;
 //    String file_name;
 
-    private NotificationManager mNotifyManager;
-    private NotificationCompat.Builder mBuilder;
 
-    int id = 1;
+
+
+    String download_type = "normal";
+    List<PodcastEpisodeDetailsPOJO> podcastEpisodeDetailsPOJOS;
 
     @Nullable
     @Override
@@ -67,10 +70,19 @@ public class DownloadSongService extends Service {
 //
 //        startDownload();
         try {
-            PodcastEpisodeDetailsPOJO podcastEpisodeDetailsPOJO = (PodcastEpisodeDetailsPOJO) intent.getSerializableExtra("podcast_episode");
+            download_type = intent.getStringExtra("download_type");
             String type = intent.getStringExtra("type");
-            Log.d(TagUtils.getTag(), podcastEpisodeDetailsPOJO.toString());
-            startDownload(type, podcastEpisodeDetailsPOJO);
+            if (download_type.equalsIgnoreCase("list")) {
+                 podcastEpisodeDetailsPOJOS=((DownloadPOJO)intent.getSerializableExtra("downloadPOJO")).getPodcastEpisodeDetailsPOJOS();
+                for(PodcastEpisodeDetailsPOJO podcastEpisodeDetailsPOJO:podcastEpisodeDetailsPOJOS){
+                    startDownload(type,podcastEpisodeDetailsPOJO);
+                }
+            } else {
+                PodcastEpisodeDetailsPOJO podcastEpisodeDetailsPOJO = (PodcastEpisodeDetailsPOJO) intent.getSerializableExtra("podcast_episode");
+                Log.d(TagUtils.getTag(), podcastEpisodeDetailsPOJO.toString());
+                startDownload(type, podcastEpisodeDetailsPOJO);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -98,17 +110,21 @@ public class DownloadSongService extends Service {
                     .setPath(file_name)
                     .build()};
 
+            final NotificationManager[] mNotifyManager = new NotificationManager[1];
+            final NotificationCompat.Builder[] mBuilder = new NotificationCompat.Builder[1];
+            int notificationId = (int) System.currentTimeMillis();
+
             downloadInfo[0].setDownloadListener(new DownloadListener() {
 
                 @Override
                 public void onStart() {
                     Log.d(TagUtils.getTag(), "Prepare downloading");
 
-                    ToastClass.showShortToast(getApplicationContext(),"Download started");
+                    ToastClass.showShortToast(getApplicationContext(), "Download started");
 
-                    mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    mNotifyManager[0] = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-                    int notificationId = (int) System.currentTimeMillis();
+
                     String channelId = "channel-01";
                     String channelName = "Channel Name";
                     int importance = NotificationManager.IMPORTANCE_HIGH;
@@ -116,11 +132,11 @@ public class DownloadSongService extends Service {
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                         NotificationChannel mChannel = new NotificationChannel(
                                 channelId, channelName, importance);
-                        mNotifyManager.createNotificationChannel(mChannel);
+                        mNotifyManager[0].createNotificationChannel(mChannel);
                     }
 
-                    mBuilder = new NotificationCompat.Builder(getApplicationContext(), channelId);
-                    mBuilder.setContentTitle(podcastEpisodeDetailsPOJO.getTitle().trim())
+                    mBuilder[0] = new NotificationCompat.Builder(getApplicationContext(), channelId);
+                    mBuilder[0].setContentTitle(podcastEpisodeDetailsPOJO.getTitle().trim())
                             .setContentText("Download in progress")
                             .setSmallIcon(R.mipmap.ic_launcher);
                 }
@@ -140,8 +156,8 @@ public class DownloadSongService extends Service {
                 @Override
                 public void onDownloading(long progress, long size) {
 
-                    mBuilder.setProgress((int) size, (int) progress, false);
-                    mNotifyManager.notify(id, mBuilder.build());
+                    mBuilder[0].setProgress((int) size, (int) progress, false);
+                    mNotifyManager[0].notify(notificationId, mBuilder[0].build());
 
                     Log.d(TagUtils.getTag(), "progress:-" + progress + "/size:-" + size);
                     Log.d(TagUtils.getTag(), "Pause");
@@ -159,14 +175,22 @@ public class DownloadSongService extends Service {
                     ToastClass.showShortToast(getApplicationContext(), "Download Complete");
                     Log.d(TagUtils.getTag(), "Delete");
                     Log.d(TagUtils.getTag(), "Download success");
-                    mBuilder.setContentText("Download completed")
+                    mBuilder[0].setContentText("Download completed")
                             // Removes the progress bar
                             .setProgress(0, 0, false);
-                    mNotifyManager.notify(id, mBuilder.build());
+                    mNotifyManager[0].notify(notificationId, mBuilder[0].build());
 
                     updatHomeActivity(StringUtils.DOWNLOAD_SONG_TYPE, podcastEpisodeDetailsPOJO);
 
-                    stopSelf();
+                    podcastEpisodeDetailsPOJO.setService_downloaded(true);
+
+                    if (download_type.equalsIgnoreCase("normal")) {
+                        stopSelf();
+                    } else {
+                        if (checkAllDownloaded()) {
+                            stopSelf();
+                        }
+                    }
                 }
 
                 @Override
@@ -180,9 +204,25 @@ public class DownloadSongService extends Service {
         } else {
             ToastClass.showShortToast(getApplicationContext(), "Download Complete");
             updatHomeActivity(StringUtils.DOWNLOAD_SONG_TYPE, podcastEpisodeDetailsPOJO);
-            stopSelf();
+            if (!download_type.equalsIgnoreCase("list")) {
+                stopSelf();
+            } else {
+                if (checkAllDownloaded()) {
+                    stopSelf();
+                }
+            }
         }
     }
+
+    public boolean checkAllDownloaded() {
+        for (PodcastEpisodeDetailsPOJO episodeDetailsPOJO : podcastEpisodeDetailsPOJOS) {
+            if (!episodeDetailsPOJO.isService_downloaded()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
 //    public void initDB() {
 //        //type:-  podcast song =1

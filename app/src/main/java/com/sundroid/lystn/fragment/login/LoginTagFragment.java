@@ -75,6 +75,7 @@ public class LoginTagFragment extends FragmentController {
             @Override
             public void onClick(View v) {
                 if(getActivity() instanceof LoginActivity){
+                    Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.LOGIN_TAG,true);
                     LoginActivity loginActivity= (LoginActivity) getActivity();
                     loginActivity.skipFragment();
                 }
@@ -139,6 +140,7 @@ public class LoginTagFragment extends FragmentController {
             @Override
             public void onErrorMsg(String status_code, String response) {
                 dismissProgressBar();
+                ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
             }
         }, "POST_GENRE").makeApiCall(WebServicesUrls.GET_GENRE_CATEGORIES, jsonObject);
     }
@@ -214,6 +216,7 @@ public class LoginTagFragment extends FragmentController {
                     JSONObject responseObject = jsonObject.optJSONObject("response");
                     if (responseObject.optBoolean("status")) {
                         if(getActivity() instanceof LoginActivity){
+                            Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.LOGIN_TAG,true);
                             LoginActivity loginActivity= (LoginActivity) getActivity();
                             loginActivity.startHome();
                         }
@@ -229,6 +232,7 @@ public class LoginTagFragment extends FragmentController {
             @Override
             public void onErrorMsg(String status_code, String response) {
                 dismissProgressBar();
+                ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
             }
         }, "POST_GENRE").makeApiCall(WebServicesUrls.POST_GENRE, jsonObject);
     }

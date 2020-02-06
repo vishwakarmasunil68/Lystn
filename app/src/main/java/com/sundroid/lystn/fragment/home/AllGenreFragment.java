@@ -110,6 +110,7 @@ public class AllGenreFragment extends FragmentController {
             @Override
             public void onErrorMsg(String status_code, String response) {
                 dismissProgressBar();
+                ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
             }
         }, "GET_HOME").makeApiCall(WebServicesUrls.GET_GENRE_BUCKET, jsonObject);
     }

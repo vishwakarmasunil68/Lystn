@@ -26,6 +26,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.google.gson.Gson;
 import com.sundroid.lystn.R;
+import com.sundroid.lystn.activity.HomeActivity;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
 import com.sundroid.lystn.util.Pref;
 import com.sundroid.lystn.util.StringUtils;
@@ -52,6 +53,8 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
     public static final String ACTION_PREVIOUS = "com.sundroid.lystn.ACTION_PREVIOUS";
     public static final String ACTION_NEXT = "com.sundroid.lystn.ACTION_NEXT";
     public static final String ACTION_STOP = "com.sundroid.lystn.ACTION_STOP";
+    public static final String ACTION_SEEK = "com.sundroid.lystn.ACTION_SEEK";
+    public static final String ACTION_QUEUE = "com.sundroid.lystn.ACTION_QUEUE";
 
     NotificationCompat.Builder mBuilder;
     NotificationManager notificationManager;
@@ -70,8 +73,12 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
 
             @Override
             public void onTick(long millisUntilFinished) {
-                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                    updateMediaTiming();
+                try {
+                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                        updateMediaTiming();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
 
@@ -154,7 +161,7 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
         mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
         //Set mediaSession's MetaData
-        updateMetaData();
+        updateNotification();
 
         // Attach Callback to receive MediaSession updates
         mediaSession.setCallback(new MediaSessionCompat.Callback() {
@@ -180,7 +187,7 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
                 super.onSkipToNext();
                 Log.d(TagUtils.getTag(), "media skiptoNext");
 //                skipToNext();
-                updateMetaData();
+                updateNotification();
                 buildNotification(PlaybackStatus.PLAYING);
             }
 
@@ -189,7 +196,7 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
                 super.onSkipToPrevious();
                 Log.d(TagUtils.getTag(), "media Previous");
 //                skipToPrevious();
-                updateMetaData();
+                updateNotification();
                 buildNotification(PlaybackStatus.PLAYING);
             }
 
@@ -207,46 +214,6 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
                 super.onSeekTo(position);
             }
         });
-    }
-
-    private void updateMetaData() {
-//        Log.d(TagUtils.getTag(), "metadata updated");
-//        try {
-//            new AsyncTask<Void, Void, Void>() {
-//                Bitmap theBitmap;
-//
-//                @Override
-//                protected Void doInBackground(Void... voids) {
-//                    try {
-//                        theBitmap = Glide.
-//                                with(MediaService.this).
-//                                load(homeContentPOJO.getImgIrl()).
-//                                asBitmap().
-//                                into(100, 100).get();
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                    return null;
-//                }
-//
-//                @Override
-//                protected void onPostExecute(Void aVoid) {
-//                    super.onPostExecute(aVoid);
-//                    if (theBitmap != null) {
-//                        Log.d(TagUtils.getTag(), "setting notification metadata");
-//                        mediaSession.setMetadata(new MediaMetadataCompat.Builder()
-//                                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, theBitmap)
-//                                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, homeContentPOJO.getConName())
-//                                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, homeContentPOJO.getConName())
-//                                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, homeContentPOJO.getConName())
-//                                .build());
-//                    }
-//                }
-//            }.execute();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        uodateNotificationData();
     }
 
     @Override
@@ -275,7 +242,7 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
                     Log.d(TagUtils.getTag(), "media_type:-" + intent.getStringExtra(StringUtils.MEDIA_TYPE));
                     Log.d(TagUtils.getTag(), "home content:-" + homeContentPOJO.toString());
                     startMediaPlayer(homeContentPOJO.getCotDeepLink());
-                    updateMetaData();
+                    updateNotification();
                 } else if (type.equalsIgnoreCase(StringUtils.PLAY_PAUSE_MEDIA)) {
                     playPauseMediaPlayer();
                 } else if (type.equalsIgnoreCase(StringUtils.CHECK_PLAYER)) {
@@ -287,6 +254,10 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
                 } else if (type.equalsIgnoreCase(StringUtils.SEEK_PLAYER)) {
                     if (mediaPlayer != null) {
                         mediaPlayer.seekTo(intent.getIntExtra(StringUtils.SEEK_PROGRESS, 0));
+                    }
+                } else if (type.equalsIgnoreCase(StringUtils.SEEK_PLAYER_ACTIVITY)) {
+                    if (mediaPlayer != null) {
+                        mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 15000);
                     }
                 }
             } catch (Exception e) {
@@ -432,10 +403,10 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
 
         if (playbackStatus == PlaybackStatus.PLAYING) {
             notificationAction = R.drawable.ic_pause_not;
-            play_pauseAction = playbackAction(1);
+            play_pauseAction = playbackServiceAction(1);
         } else if (playbackStatus == PlaybackStatus.PAUSED) {
             notificationAction = R.drawable.ic_play_not;
-            play_pauseAction = playbackAction(0);
+            play_pauseAction = playbackServiceAction(0);
         }
 
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(),
@@ -454,41 +425,51 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
                     channelId, channelName, importance);
             notificationManager.createNotificationChannel(mChannel);
         }
-
-        mBuilder = new NotificationCompat.Builder(getApplicationContext(), channelId)
-                .setShowWhen(false)
-                .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
-                        .setMediaSession(mediaSession.getSessionToken()))
-                .setColor(getResources().getColor(R.color.colorPrimary))
-                .setLargeIcon(largeIcon)
-                .setOngoing(true)
-                .setSmallIcon(android.R.drawable.stat_sys_headset)
-                .addAction(R.drawable.ic_repeat_one, "previous", playbackAction(4))
-                .addAction(R.drawable.ic_backward, "previous", playbackAction(3))
-                .addAction(notificationAction, "pause", play_pauseAction)
-                .addAction(R.drawable.ic_next, "next", playbackAction(2))
-                .addAction(R.drawable.ic_queue, "next", playbackAction(5))
-                .setPriority(Notification.PRIORITY_MAX);
-
-
-
-        if (homeContentPOJO != null) {
-            uodateNotificationData();
+        if (Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").equalsIgnoreCase("radio")) {
+            mBuilder = new NotificationCompat.Builder(getApplicationContext(), channelId)
+                    .setShowWhen(false)
+                    .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                            .setMediaSession(mediaSession.getSessionToken()))
+                    .setColor(getResources().getColor(R.color.colorPrimary))
+                    .setLargeIcon(largeIcon)
+                    .setOngoing(true)
+                    .setSmallIcon(android.R.drawable.stat_sys_headset)
+//                    .addAction(R.drawable.ic_repeat_one, "previous", playbackAction(4))
+//                    .addAction(R.drawable.ic_backward, "previous", playbackAction(3))
+                    .addAction(notificationAction, "pause", play_pauseAction)
+//                    .addAction(R.drawable.ic_next, "next", playbackAction(2))
+//                    .addAction(R.drawable.ic_queue, "next", playbackAction(5))
+                    .setPriority(Notification.PRIORITY_MAX);
+        } else {
+            mBuilder = new NotificationCompat.Builder(getApplicationContext(), channelId)
+                    .setShowWhen(false)
+                    .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                            .setMediaSession(mediaSession.getSessionToken()))
+                    .setColor(getResources().getColor(R.color.colorPrimary))
+                    .setLargeIcon(largeIcon)
+                    .setOngoing(true)
+                    .setSmallIcon(android.R.drawable.stat_sys_headset)
+                    .addAction(R.drawable.ic_repeat_one, "seek", playbackServiceAction(4))
+                    .addAction(R.drawable.ic_backward, "previous", playbackServiceAction(3))
+                    .addAction(notificationAction, "pause", play_pauseAction)
+                    .addAction(R.drawable.ic_next, "next", playbackServiceAction(2))
+                    .addAction(R.drawable.ic_queue, "list", playbackAction(5))
+                    .setPriority(Notification.PRIORITY_MAX);
         }
 
-        mBuilder.setContentIntent(play_pauseAction);
+        if (homeContentPOJO != null) {
+            updateNotification();
+        }
 
-//        notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-
-//        notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        mBuilder.setContentIntent(playbackAction(0));
     }
 
     Bitmap theBitmap;
 
-    private void uodateNotificationData() {
-        if(theBitmap!=null){
+    private void updateNotification() {
+        if (theBitmap != null) {
             try {
-                if(theBitmap != null){
+                if (theBitmap != null) {
                     Log.d(TagUtils.getTag(), "setting notification metadata");
                     mBuilder.setLargeIcon(theBitmap);
                     mBuilder.setContentText(homeContentPOJO.getConName().trim());
@@ -497,7 +478,6 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
                     } else {
                         mBuilder.setContentTitle(Pref.GetStringPref(getApplicationContext(), StringUtils.NOTIFICAION_ALBUM_NAME, "").trim());
                     }
-
                     mBuilder.setContentInfo(Pref.GetStringPref(getApplicationContext(), StringUtils.MEDIA_TYPE, "").trim());
                     notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
                 }
@@ -523,7 +503,7 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 try {
-                    if(theBitmap != null){
+                    if (theBitmap != null) {
                         Log.d(TagUtils.getTag(), "setting notification metadata");
                         mBuilder.setLargeIcon(theBitmap);
                         mBuilder.setContentText(homeContentPOJO.getConName().trim());
@@ -548,7 +528,7 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
         notificationManager.cancel(NOTIFICATION_ID);
     }
 
-    private PendingIntent playbackAction(int actionNumber) {
+    private PendingIntent playbackServiceAction(int actionNumber) {
         Intent playbackAction = new Intent(this, MediaService.class);
         switch (actionNumber) {
             case 0:
@@ -571,10 +551,63 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
                 Log.d(TagUtils.getTag(), "action previous");
                 playbackAction.setAction(ACTION_PREVIOUS);
                 return PendingIntent.getService(this, actionNumber, playbackAction, 0);
+            case 4:
+                // Previous track
+                Log.d(TagUtils.getTag(), "action previous");
+                playbackAction.setAction(ACTION_SEEK);
+                return PendingIntent.getService(this, actionNumber, playbackAction, 0);
             default:
                 break;
         }
         return null;
+    }
+
+    private PendingIntent playbackAction(int actionNumber) {
+        Log.d(TagUtils.getTag(), "actionnumber:-" + actionNumber);
+        Intent playbackAction = new Intent(this, HomeActivity.class);
+//        playbackAction.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+        switch (actionNumber) {
+            case 0:
+                // Play
+                Log.d(TagUtils.getTag(), "action play");
+                playbackAction.setAction(ACTION_PLAY);
+//                playbackAction.putExtra("action", ACTION_PLAY);
+                return PendingIntent.getActivity(this, actionNumber, playbackAction, PendingIntent.FLAG_UPDATE_CURRENT);
+            case 1:
+                // Pause
+                Log.d(TagUtils.getTag(), "action pause");
+                playbackAction.setAction(ACTION_PAUSE);
+//                playbackAction.putExtra("action", ACTION_PAUSE);
+                return PendingIntent.getActivity(this, actionNumber, playbackAction, PendingIntent.FLAG_UPDATE_CURRENT);
+            case 2:
+                // Next track
+                Log.d(TagUtils.getTag(), "action next");
+                playbackAction.setAction(ACTION_NEXT);
+//                playbackAction.putExtra("action", ACTION_NEXT);
+                return PendingIntent.getActivity(this, actionNumber, playbackAction, PendingIntent.FLAG_UPDATE_CURRENT);
+            case 3:
+                // Previous track
+                Log.d(TagUtils.getTag(), "action previous");
+                playbackAction.setAction(ACTION_PREVIOUS);
+//                playbackAction.putExtra("action", ACTION_PREVIOUS);
+                return PendingIntent.getActivity(this, actionNumber, playbackAction, PendingIntent.FLAG_UPDATE_CURRENT);
+            case 4:
+                Log.d(TagUtils.getTag(), "action seek");
+                playbackAction.setAction(ACTION_SEEK);
+                playbackAction.putExtra("action", ACTION_SEEK);
+                return PendingIntent.getActivity(this, actionNumber, playbackAction, PendingIntent.FLAG_UPDATE_CURRENT);
+            case 5:
+                Log.d(TagUtils.getTag(), "action queue");
+                playbackAction.setAction(ACTION_QUEUE);
+                playbackAction.putExtra("action", ACTION_QUEUE);
+                return PendingIntent.getActivity(this, actionNumber, playbackAction, PendingIntent.FLAG_UPDATE_CURRENT);
+            default:
+//                Log.d(TagUtils.getTag(), "action default");
+//                playbackAction.setAction(ACTION_PREVIOUS);
+//                playbackAction.putExtra("action", ACTION_PREVIOUS);
+//                return PendingIntent.getActivity(this, actionNumber, playbackAction, PendingIntent.FLAG_UPDATE_CURRENT);
+                return null;
+        }
     }
 
     private void handleIncomingActions(Intent playbackAction) {
@@ -601,6 +634,13 @@ public class MediaService extends Service implements MediaPlayer.OnPreparedListe
         } else if (actionString.equalsIgnoreCase(ACTION_STOP)) {
             Log.d(TagUtils.getTag(), "handling stop");
             transportControls.stop();
+        } else if (actionString.equalsIgnoreCase(ACTION_SEEK)) {
+            Log.d(TagUtils.getTag(), "handling stop");
+            if (mediaPlayer != null) {
+                mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 15000);
+                transportControls.seekTo(mediaPlayer.getCurrentPosition() + 15000);
+            }
+
         }
     }
 }

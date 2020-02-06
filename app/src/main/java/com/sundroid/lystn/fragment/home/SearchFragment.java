@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,9 +25,19 @@ import com.sundroid.lystn.adapter.ViewPagerAdapter;
 import com.sundroid.lystn.fragment.search.AllSearchResultFragment;
 import com.sundroid.lystn.fragment.search.SearchArtistFragment;
 import com.sundroid.lystn.fragment.search.SearchEpisodesFragment;
-import com.sundroid.lystn.fragment.search.SearchMyDownloadFragment;
 import com.sundroid.lystn.fragment.search.SearchPodcastsFragment;
 import com.sundroid.lystn.fragmentcontroller.FragmentController;
+import com.sundroid.lystn.pojo.artiste.PodcastEpisodeDetailsPOJO;
+import com.sundroid.lystn.util.Pref;
+import com.sundroid.lystn.util.StringUtils;
+import com.sundroid.lystn.util.TagUtils;
+import com.sundroid.lystn.util.ToastClass;
+import com.sundroid.lystn.webservice.ApiCallBase;
+import com.sundroid.lystn.webservice.WebServicesCallBack;
+import com.sundroid.lystn.webservice.WebServicesUrls;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -219,6 +230,53 @@ public class SearchFragment extends FragmentController {
 
         linearLayouts.get(position).setBackgroundResource(R.drawable.ic_tab_selected);
         textViews.get(position).setTextColor(Color.parseColor("#FFFFFF"));
+    }
 
+    List<PodcastEpisodeDetailsPOJO> podcastEpisodeDetailsPOJOS=new ArrayList<>();
+
+    public void callSearchAPI(String search_text){
+        JSONObject jsonObject = new JSONObject();
+
+//        showProgressBar();
+
+        try {
+            jsonObject.put("userId", Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.USER_ID, ""));
+            jsonObject.put("deviceId", Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.DEVICE_ID, ""));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        new ApiCallBase(getActivity(), new WebServicesCallBack() {
+            @Override
+            public void onGetMsg(String apicall, String response) {
+//                dismissProgressBar();
+//                homeContentPOJOS.clear();
+                try {
+                    String object = new String(response);
+                    JSONObject jsonObject = new JSONObject(object);
+                    JSONObject responseObject = jsonObject.optJSONObject("response");
+                    if (responseObject.optBoolean("status")) {
+
+                        JSONObject result=responseObject.optJSONObject("result");
+                        JSONObject episodes_bucket=result.optJSONObject("episodes_bucket");
+
+                        for(int i=0;i<episodes_bucket.length();i++){
+
+                        }
+
+                    } else {
+                        ToastClass.showShortToast(getActivity().getApplicationContext(), "Something went wrong");
+                    }
+                    Log.d(TagUtils.getTag(), jsonObject.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void onErrorMsg(String status_code, String response) {
+//                dismissProgressBar();
+                ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
+            }
+        }, "GET_SEARCH_RESULT").makeApiCall(WebServicesUrls.GET_SEARCH_RESULT, jsonObject);
     }
 }

@@ -72,7 +72,16 @@ public class LoginActivity extends ActivityManager {
 //            }
 //        });
 
-        startSelectLangageFragment();
+        Log.d(TagUtils.getTag(),"Login activity");
+        if(Pref.GetBooleanPref(getApplicationContext(), StringUtils.LOGIN_MAIN,false)){
+            startLoginTagFragment();
+        }else if(Pref.GetBooleanPref(getApplicationContext(), StringUtils.LOGIN_LANGUAGE,false)){
+            startLoginDefaultFragment();
+        }else{
+            startSelectLangageFragment();
+        }
+
+
 //        startLoginTagFragment();
 
         getAllPermissions();

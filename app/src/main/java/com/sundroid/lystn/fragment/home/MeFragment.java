@@ -36,6 +36,8 @@ public class MeFragment extends FragmentController {
     TextView tv_user_name;
     @BindView(R.id.ll_logout)
     LinearLayout ll_logout;
+    @BindView(R.id.ll_profile)
+    LinearLayout ll_profile;
 
     @Nullable
     @Override
@@ -102,10 +104,27 @@ public class MeFragment extends FragmentController {
                 getActivity().finishAffinity();
             }
         });
+
+        ll_profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(getActivity() instanceof HomeActivity){
+                    HomeActivity homeActivity= (HomeActivity) getActivity();
+                    homeActivity.startProfileFragment();
+                }
+            }
+        });
     }
 
     public void clearSongDB() {
         EasyDB easyDB = EasyDB.init(getActivity(), "Lystn").setTableName("downloads");
         easyDB.deleteAllDataFromTable();
+
+
+        Pref.SetBooleanPref(getActivity().getApplicationContext(),StringUtils.LOGIN_TAG,false);
+        Pref.SetBooleanPref(getActivity().getApplicationContext(),StringUtils.LOGIN_MAIN,false);
+        Pref.SetBooleanPref(getActivity().getApplicationContext(),StringUtils.LOGIN_LANGUAGE,false);
+        Pref.SetBooleanPref(getActivity().getApplicationContext(),StringUtils.WALKTHORUGH_SKIPPED,false);
+
     }
 }

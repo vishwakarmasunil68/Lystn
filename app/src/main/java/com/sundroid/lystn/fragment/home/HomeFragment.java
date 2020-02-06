@@ -82,7 +82,6 @@ public class HomeFragment extends FragmentController {
         this.homeContentPOJO = homeContentPOJO;
 
 
-
         shimmerText.startShimmer();
     }
 
@@ -128,18 +127,14 @@ public class HomeFragment extends FragmentController {
         attachHomeAdapter();
 
 
-
-
         getHomeData();
     }
-
-
 
 
     public void getHomeData() {
         JSONObject jsonObject = new JSONObject();
 
-        showProgressBar();
+//        showProgressBar();
 
         try {
             jsonObject.put("userId", Pref.GetStringPref(getActivity().getApplicationContext(), StringUtils.USER_ID, ""));
@@ -152,7 +147,7 @@ public class HomeFragment extends FragmentController {
         new ApiCallBase(getActivity(), new WebServicesCallBack() {
             @Override
             public void onGetMsg(String apicall, String response) {
-                dismissProgressBar();
+//                dismissProgressBar();
                 shimmerText.stopShimmer();
                 ll_home_content.setVisibility(View.VISIBLE);
                 ll_home_default.setVisibility(View.GONE);
@@ -194,6 +189,7 @@ public class HomeFragment extends FragmentController {
             @Override
             public void onErrorMsg(String status_code, String response) {
                 dismissProgressBar();
+                ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
             }
         }, "GET_HOME").makeApiCall(WebServicesUrls.GET_HOME, jsonObject);
     }

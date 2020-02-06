@@ -27,11 +27,17 @@ public class StringUtils {
     public static String UPDATE_HOME_ACTIVITY="UPDATE_HOME_ACTIVITY";
     public static String UPDATE_SERVICE="UPDATE_SERVICE";
 
+    public static String WALKTHORUGH_SKIPPED="WALKTHORUGH_SKIPPED";
+    public static String LOGIN_LANGUAGE="LOGIN_LANGUAGE";
+    public static String LOGIN_TAG="LOGIN_TAG";
+    public static String LOGIN_MAIN="LOGIN_MAIN";
+
     public static String PLAY_SONG="PLAY_SONG";
     public static String COMMAND="COMMAND";
     public static String AUDIO_DATA="AUDIO_DATA";
     public static String SEEK_PROGRESS="SEEK_PROGRESS";
     public static String SEEK_PLAYER="SEEK_PLAYER";
+    public static String SEEK_PLAYER_ACTIVITY="SEEK_PLAYER_ACTIVITY";
     public static String MEDIA_TYPE="MEDIA_TYPE";
     public static String PLAY_PAUSE_MEDIA="PLAY_PAUSE_MEDIA";
     public static String CHECK_PLAYER="CHECK_PLAYER";

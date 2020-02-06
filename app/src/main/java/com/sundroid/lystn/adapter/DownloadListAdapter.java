@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -12,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.chauthai.swipereveallayout.SwipeRevealLayout;
 import com.sundroid.lystn.R;
 import com.sundroid.lystn.activity.HomeActivity;
 import com.sundroid.lystn.fragment.download.DownloadListFragment;
@@ -36,6 +38,7 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
         this.items = items;
         this.activity = activity;
         this.fragment = fragment;
+        setHasStableIds(true);
     }
 
     @Override
@@ -99,15 +102,59 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
             }
         });
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View v) {
+            public void onClick(View v) {
+                if (activity instanceof HomeActivity) {
+                    HomeActivity homeActivity = (HomeActivity) activity;
+                    Pref.SetStringPref(activity.getApplicationContext(), StringUtils.NOTIFICAION_ALBUM_NAME, items.get(position).getConName());
+                    homeActivity.playAudio(items, position, "download", null);
+                }
+            }
+        });
+
+//        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                show_checks = true;
+//                notifyDataSetChanged();
+//                holder.ll_check.callOnClick();
+//                return false;
+//            }
+//        });
+
+        holder.frame_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 show_checks = true;
                 notifyDataSetChanged();
                 holder.ll_check.callOnClick();
-                return false;
+                holder.swipeReveal.close(true);
             }
         });
+
+        holder.ll_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (activity instanceof HomeActivity) {
+                    HomeActivity homeActivity = (HomeActivity) activity;
+                    Pref.SetStringPref(activity.getApplicationContext(), StringUtils.NOTIFICAION_ALBUM_NAME, items.get(position).getConName());
+                    homeActivity.playAudio(items, position, "download", items.get(position).getPodcastDetailPOJO());
+                }
+            }
+        });
+
+        holder.ll_content.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (activity instanceof HomeActivity) {
+                    HomeActivity homeActivity = (HomeActivity) activity;
+                    Pref.SetStringPref(activity.getApplicationContext(), StringUtils.NOTIFICAION_ALBUM_NAME, items.get(position).getConName());
+                    homeActivity.playAudio(items, position, "download", items.get(position).getPodcastDetailPOJO());
+                }
+            }
+        });
+
 
         holder.itemView.setTag(items.get(position));
     }
@@ -117,6 +164,15 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
         return items.size();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -134,6 +190,16 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
         ImageView iv_play;
         @BindView(R.id.ll_play)
         LinearLayout ll_play;
+        @BindView(R.id.tv_delete)
+        TextView tv_delete;
+        @BindView(R.id.frame_delete)
+        FrameLayout frame_delete;
+        @BindView(R.id.swipeReveal)
+        SwipeRevealLayout swipeReveal;
+        @BindView(R.id.ll_image)
+        LinearLayout ll_image;
+        @BindView(R.id.ll_content)
+        LinearLayout ll_content;
 
         public ViewHolder(View itemView) {
             super(itemView);

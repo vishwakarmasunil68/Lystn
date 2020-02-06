@@ -13,6 +13,8 @@ import androidx.annotation.Nullable;
 import com.sundroid.lystn.R;
 import com.sundroid.lystn.activity.WelcomeActivity;
 import com.sundroid.lystn.fragmentcontroller.FragmentController;
+import com.sundroid.lystn.util.Pref;
+import com.sundroid.lystn.util.StringUtils;
 
 import butterknife.BindView;
 
@@ -48,6 +50,7 @@ public class Welcome1Fragment extends FragmentController {
             @Override
             public void onClick(View v) {
                 if(getActivity() instanceof WelcomeActivity){
+                    Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.WALKTHORUGH_SKIPPED,true);
                     WelcomeActivity welcomeActivity= (WelcomeActivity) getActivity();
                     welcomeActivity.skipToLogin();
                 }

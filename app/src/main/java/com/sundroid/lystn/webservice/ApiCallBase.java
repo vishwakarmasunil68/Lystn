@@ -66,7 +66,8 @@ public class ApiCallBase {
 
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
-                Log.d(TagUtils.getTag(), msg+":- status_code:-" + statusCode+",error:-"+(new String(responseBody)));
+                Log.d(TagUtils.getTag(),"call failed");
+//                Log.d(TagUtils.getTag(), msg+":- status_code:-" + statusCode+",error:-"+(new String(responseBody)));
             }
         });
     }

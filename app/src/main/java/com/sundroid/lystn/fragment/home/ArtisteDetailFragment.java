@@ -52,6 +52,8 @@ public class ArtisteDetailFragment extends FragmentController {
     ImageView iv_back;
     @BindView(R.id.iv_favorited)
     ImageView iv_favorited;
+    @BindView(R.id.tv_podcast_by)
+    TextView tv_podcast_by;
 
     PodcastDetailPOJO podcastDetailPOJO;
 
@@ -126,7 +128,8 @@ public class ArtisteDetailFragment extends FragmentController {
 
                             @Override
                             public void onErrorMsg(String status_code, String response) {
-
+                                ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
+                                homeActivity.dismissProgressBar();
                             }
                         }, "UNFOLLOW_API").makeApiCall(WebServicesUrls.UNFOLLOW_API, jsonObject);
                     } else {
@@ -167,7 +170,8 @@ public class ArtisteDetailFragment extends FragmentController {
 
                             @Override
                             public void onErrorMsg(String status_code, String response) {
-
+                                ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
+                                homeActivity.dismissProgressBar();
                             }
                         }, "FOLLOW_API").makeApiCall(WebServicesUrls.FOLLOW_API, jsonObject);
                     }
@@ -240,6 +244,8 @@ public class ArtisteDetailFragment extends FragmentController {
                                 .dontAnimate()
                                 .into(iv_podcast_image);
 
+                        tv_podcast_by.setText("Podcast by "+podcastPOJO.getPodcastDetailPOJO().getTitle());
+
                         podcastEpisodeDetailsPOJOS.addAll(podcastPOJO.getPodcastEpisodeDetailsPOJOS());
                         podcastEpisodeAdapter.notifyDataSetChanged();
 
@@ -268,6 +274,7 @@ public class ArtisteDetailFragment extends FragmentController {
 
             @Override
             public void onErrorMsg(String status_code, String response) {
+                ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
                 dismissProgressBar();
             }
         }, "GET_PODCAST_DETAILS").makeApiCall(WebServicesUrls.GET_PODCAST_DETAILS, jsonObject);

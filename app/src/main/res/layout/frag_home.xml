@@ -56,7 +56,8 @@
                 android:id="@+id/ll_home_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_home"
@@ -83,8 +84,9 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitXY"
-                        android:src="@drawable/img_home_placeholder" />
+                        android:scaleType="centerCrop"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/ic_img_home_placeholder" />
 
                 </com.facebook.shimmer.ShimmerFrameLayout>
 

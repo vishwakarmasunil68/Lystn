@@ -61,5 +61,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     compile 'com.ixuea:AndroidDownloader:2.0.4'
     implementation 'com.github.p32929:AndroidEasySQL-Library:1.4.0'
+    compile 'com.chauthai.swipereveallayout:swipe-reveal-layout:1.4.1'
+    implementation 'net.alhazmy13.MediaPicker:libary:2.4.4'
 }
 apply plugin: 'com.google.gms.google-services'

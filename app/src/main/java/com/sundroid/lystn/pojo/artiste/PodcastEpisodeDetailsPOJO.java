@@ -62,6 +62,8 @@ public class PodcastEpisodeDetailsPOJO implements Serializable {
     @Expose
     private String addedOn;
     private boolean downloaded;
+    private boolean service_downloaded;
+    private PodcastPOJO podcastPOJO;
 
     public String getEpisodeId() {
         return episodeId;
@@ -238,5 +240,21 @@ public class PodcastEpisodeDetailsPOJO implements Serializable {
                 ", addedOn='" + addedOn + '\'' +
                 ", downloaded=" + downloaded +
                 '}';
+    }
+
+    public boolean isService_downloaded() {
+        return service_downloaded;
+    }
+
+    public void setService_downloaded(boolean service_downloaded) {
+        this.service_downloaded = service_downloaded;
+    }
+
+    public PodcastPOJO getPodcastPOJO() {
+        return podcastPOJO;
+    }
+
+    public void setPodcastPOJO(PodcastPOJO podcastPOJO) {
+        this.podcastPOJO = podcastPOJO;
     }
 }

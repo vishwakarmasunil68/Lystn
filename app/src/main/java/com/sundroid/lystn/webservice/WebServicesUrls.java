@@ -16,6 +16,7 @@ public class WebServicesUrls {
     public static final String GET_HOME = "http://api.lystnfm.com/api/v1/feed/GetHome";
     public static final String GET_CATEGORY_BUCKET = "http://api.lystnfm.com/api/v1/feed/GetCategoryBucket";
     public static final String GET_GENRE_BUCKET = "http://api.lystnfm.com/api/v1/feed/GetGenreBucket";
+
     public static final String GET_ARTIST_BUCKET = "http://api.lystnfm.com/api/v1/feed/GetArtistBucket";
     public static final String GET_RADIO_BUCKET = "http://api.lystnfm.com/api/v1/feed/GetRadioBucket";
     public static final String STORE_SOCIAL_PROFILE = "http://api.lystnfm.com/api/v1/feed/StoreSocialProfile";
@@ -24,5 +25,6 @@ public class WebServicesUrls {
     public static final String UNFOLLOW_API = "http://api.lystnfm.com/api/v1/feed/unFollow";
     public static final String GET_PODCAST_DETAILS = "http://api.lystnfm.com/api/v1/feed/GetPodcastDetail";
     public static final String GET_PROFILE = "http://api.lystnfm.com/api/v1/feed/GetProfile";
+    public static final String GET_SEARCH_RESULT = "http://api.lystnfm.com/api/v1/feed/GetSearcResults";
 
 }

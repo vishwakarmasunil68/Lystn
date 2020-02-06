@@ -13,6 +13,8 @@ import androidx.annotation.Nullable;
 import com.sundroid.lystn.R;
 import com.sundroid.lystn.activity.WelcomeActivity;
 import com.sundroid.lystn.fragmentcontroller.FragmentController;
+import com.sundroid.lystn.util.Pref;
+import com.sundroid.lystn.util.StringUtils;
 
 import butterknife.BindView;
 
@@ -26,8 +28,8 @@ public class Welcome3Fragment extends FragmentController {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.frag_welcome_3,container,false);
-        setUpView(getActivity(),this,view);
+        View view = inflater.inflate(R.layout.frag_welcome_3, container, false);
+        setUpView(getActivity(), this, view);
         return view;
     }
 
@@ -37,8 +39,9 @@ public class Welcome3Fragment extends FragmentController {
         iv_next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getActivity() instanceof WelcomeActivity){
-                    WelcomeActivity welcomeActivity= (WelcomeActivity) getActivity();
+                if (getActivity() instanceof WelcomeActivity) {
+                    Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.WALKTHORUGH_SKIPPED, true);
+                    WelcomeActivity welcomeActivity = (WelcomeActivity) getActivity();
                     welcomeActivity.showNext();
                 }
             }
@@ -47,8 +50,9 @@ public class Welcome3Fragment extends FragmentController {
         tv_skip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getActivity() instanceof WelcomeActivity){
-                    WelcomeActivity welcomeActivity= (WelcomeActivity) getActivity();
+                if (getActivity() instanceof WelcomeActivity) {
+                    Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.WALKTHORUGH_SKIPPED, true);
+                    WelcomeActivity welcomeActivity = (WelcomeActivity) getActivity();
                     welcomeActivity.skipToLogin();
                 }
             }

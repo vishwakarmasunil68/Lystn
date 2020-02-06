@@ -17,6 +17,7 @@ import com.sundroid.lystn.activity.HomeActivity;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
 import com.sundroid.lystn.util.Pref;
 import com.sundroid.lystn.util.StringUtils;
+import com.sundroid.lystn.util.ToastClass;
 import com.sundroid.lystn.webservice.ApiCallBase;
 import com.sundroid.lystn.webservice.WebServicesCallBack;
 import com.sundroid.lystn.webservice.WebServicesUrls;
@@ -81,7 +82,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
                 if (type.equalsIgnoreCase("genre")) {
                     if (activity instanceof HomeActivity) {
                         HomeActivity homeActivity = (HomeActivity) activity;
-                        homeActivity.startPodcastFragment(items.get(position).getConId());
+                        homeActivity.startGenreDetailFragment(items.get(position).getConId());
                     }
                 } else if (type.equalsIgnoreCase("radio")) {
 //                    if (activity instanceof HomeActivity) {
@@ -139,7 +140,8 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
 
                             @Override
                             public void onErrorMsg(String status_code, String response) {
-
+                                ToastClass.showShortToast(activity.getApplicationContext(),"Server Down");
+                                homeActivity.dismissProgressBar();
                             }
                         }, "UNFOLLOW_API").makeApiCall(WebServicesUrls.UNFOLLOW_API, jsonObject);
                     } else {
@@ -180,7 +182,8 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
 
                             @Override
                             public void onErrorMsg(String status_code, String response) {
-
+                                ToastClass.showShortToast(activity.getApplicationContext(),"Server Down");
+                                homeActivity.dismissProgressBar();
                             }
                         }, "FOLLOW_API").makeApiCall(WebServicesUrls.FOLLOW_API, jsonObject);
                     }

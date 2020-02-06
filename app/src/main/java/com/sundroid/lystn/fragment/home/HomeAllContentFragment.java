@@ -148,6 +148,8 @@ public class HomeAllContentFragment extends FragmentController {
             @Override
             public void onErrorMsg(String status_code, String response) {
                 dismissProgressBar();
+                ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
+
             }
         }, "GET_HOME_CONTENT").makeApiCall(url, jsonObject);
     }

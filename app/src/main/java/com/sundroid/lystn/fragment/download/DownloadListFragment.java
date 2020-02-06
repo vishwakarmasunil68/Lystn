@@ -3,6 +3,7 @@ package com.sundroid.lystn.fragment.download;
 import android.app.Dialog;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.sundroid.lystn.activity.HomeActivity;
 import com.sundroid.lystn.adapter.DownloadListAdapter;
 import com.sundroid.lystn.fragmentcontroller.FragmentController;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
+import com.sundroid.lystn.util.TagUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +42,8 @@ public class DownloadListFragment extends FragmentController {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.frag_download_list,container,false);
-        setUpView(getActivity(),this,view);
+        View view = inflater.inflate(R.layout.frag_download_list, container, false);
+        setUpView(getActivity(), this, view);
         return view;
     }
 
@@ -49,8 +51,8 @@ public class DownloadListFragment extends FragmentController {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if(getActivity() instanceof HomeActivity){
-            HomeActivity homeActivity= (HomeActivity) getActivity();
+        if (getActivity() instanceof HomeActivity) {
+            HomeActivity homeActivity = (HomeActivity) getActivity();
             downloadPojos.addAll(homeActivity.getDbManager().readAllSongs());
         }
 
@@ -72,15 +74,15 @@ public class DownloadListFragment extends FragmentController {
 
     }
 
-    public void deleteSong(boolean show){
-        if(show){
+    public void deleteSong(boolean show) {
+        if (show) {
             iv_delete.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             iv_delete.setVisibility(View.GONE);
         }
     }
 
-    List<HomeContentPOJO> downloadPojos=new ArrayList<>();
+    List<HomeContentPOJO> downloadPojos = new ArrayList<>();
     DownloadListAdapter downloadListAdapter;
 
     public void attachGenericAdapter(RecyclerView rv) {
@@ -93,7 +95,7 @@ public class DownloadListFragment extends FragmentController {
         rv.setItemAnimator(new DefaultItemAnimator());
     }
 
-    public void showDeleteDialog(){
+    public void showDeleteDialog() {
         final Dialog dialog1 = new Dialog(getActivity(), android.R.style.Theme_DeviceDefault_Light_Dialog);
         dialog1.setCancelable(true);
         dialog1.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -127,17 +129,39 @@ public class DownloadListFragment extends FragmentController {
         });
     }
 
-    public void deleteSongs(){
-        if(getActivity() instanceof HomeActivity){
-            HomeActivity homeActivity= (HomeActivity) getActivity();
-            for(int i=0;i<downloadPojos.size();i++){
-                HomeContentPOJO homeContentPOJO=downloadPojos.get(i);
-                if(homeActivity.getDbManager().removeSong(homeContentPOJO.getConId())){
-                    downloadPojos.remove(i);
+    public void deleteSongs() {
+
+        if (getActivity() instanceof HomeActivity) {
+            int length=downloadPojos.size();
+            for(int j=0;j<length;j++){
+                HomeActivity homeActivity = (HomeActivity) getActivity();
+                for (int i = 0; i < downloadPojos.size(); i++) {
+                    HomeContentPOJO homeContentPOJO = downloadPojos.get(i);
+                    if (homeContentPOJO.isChecked()) {
+                        Log.d(TagUtils.getTag(),"position:-"+i+",id:-"+homeContentPOJO.getConName());
+                        boolean removed = homeActivity.getDbManager().removeSong(homeContentPOJO.getConId());
+                        Log.d(TagUtils.getTag(), "removed:-" + removed + ",id:-" + homeContentPOJO.getConName());
+                        if (removed) {
+                            downloadPojos.remove(i);
+                        }
+                    }
                 }
             }
         }
+
         downloadListAdapter.notifyDataSetChanged();
+//        new CountDownTimer(10000,1000){
+//
+//            @Override
+//            public void onTick(long millisUntilFinished) {
+//
+//            }
+//
+//            @Override
+//            public void onFinish() {
+//
+//            }
+//        }.start();
     }
 
 

@@ -2,6 +2,7 @@ package com.sundroid.lystn.pojo.home;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.sundroid.lystn.pojo.artiste.PodcastDetailPOJO;
 
 import java.io.Serializable;
 
@@ -23,6 +24,7 @@ public class HomeContentPOJO implements Serializable {
     private boolean playing;
     private boolean showchecks;
     private boolean checked;
+    private PodcastDetailPOJO podcastDetailPOJO;
 
     public String getConId() {
         return conId;
@@ -104,5 +106,13 @@ public class HomeContentPOJO implements Serializable {
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    public PodcastDetailPOJO getPodcastDetailPOJO() {
+        return podcastDetailPOJO;
+    }
+
+    public void setPodcastDetailPOJO(PodcastDetailPOJO podcastDetailPOJO) {
+        this.podcastDetailPOJO = podcastDetailPOJO;
     }
 }

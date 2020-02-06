@@ -79,9 +79,15 @@ public class LoginDefaultFragment extends FragmentController implements GoogleAp
         tv_skip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//                if (getActivity() instanceof LoginActivity) {
+//                    LoginActivity loginActivity = (LoginActivity) getActivity();
+//                    loginActivity.skipFragment();
+//                }
                 if (getActivity() instanceof LoginActivity) {
+                    Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.LOGIN_MAIN,true);
                     LoginActivity loginActivity = (LoginActivity) getActivity();
-                    loginActivity.skipFragment();
+                    loginActivity.startLoginTagFragment();
+//                            loginActivity.startHome();
                 }
             }
         });
@@ -213,6 +219,7 @@ public class LoginDefaultFragment extends FragmentController implements GoogleAp
                         Pref.SetStringPref(getActivity().getApplicationContext(), StringUtils.USER_ID, profileJSON.optString("userId"));
                         Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.IS_LOGIN, true);
                         if (getActivity() instanceof LoginActivity) {
+                            Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.LOGIN_MAIN,true);
                             LoginActivity loginActivity = (LoginActivity) getActivity();
                             loginActivity.startLoginTagFragment();
 //                            loginActivity.startHome();
@@ -229,6 +236,7 @@ public class LoginDefaultFragment extends FragmentController implements GoogleAp
             @Override
             public void onErrorMsg(String status_code, String response) {
                 dismissProgressBar();
+                ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
             }
         }, "STORE_SOCIAL_PROFILE").makeApiCall(WebServicesUrls.STORE_SOCIAL_PROFILE, jsonObject);
     }

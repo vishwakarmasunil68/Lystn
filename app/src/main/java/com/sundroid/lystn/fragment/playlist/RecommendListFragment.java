@@ -65,7 +65,7 @@ public class RecommendListFragment extends FragmentController {
         recyclerView.setLayoutManager(linearLayoutManager);
         RecommentRVAdapter homeGenreAdapter = new RecommentRVAdapter(getActivity(), this, genrePOJOS);
         recyclerView.setAdapter(homeGenreAdapter);
-        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setNestedScrollingEnabled(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 }

@@ -202,9 +202,10 @@
         android:layout_marginTop="16dp"/>
 
     <com.sundroid.lystn.view.RobotoBoldTV
+        android:id="@+id/tv_podcast_by"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Podcast by NPR"
+        android:text="Podcast"
         android:layout_marginLeft="16dp"
         android:textColor="#000000"
         android:textSize="18sp"

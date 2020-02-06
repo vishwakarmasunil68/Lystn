@@ -82,8 +82,9 @@ public class LoginWithPhoneFragment extends FragmentController {
             @Override
             public void onClick(View v) {
                 if (getActivity() instanceof LoginActivity) {
+                    Pref.SetBooleanPref(getActivity().getApplicationContext(),StringUtils.LOGIN_MAIN,true);
                     LoginActivity loginActivity = (LoginActivity) getActivity();
-                    loginActivity.skipFragment();
+                    loginActivity.startLoginTagFragment();
                 }
             }
         });
@@ -185,6 +186,7 @@ public class LoginWithPhoneFragment extends FragmentController {
             @Override
             public void onErrorMsg(String status_code, String response) {
                 dismissProgressBar();
+                ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
             }
         }, "GET_OTP").makeApiCall(WebServicesUrls.GET_OTP, jsonObject);
     }
@@ -238,6 +240,7 @@ public class LoginWithPhoneFragment extends FragmentController {
                         Pref.SetStringPref(getActivity().getApplicationContext(), StringUtils.USER_ID, profileJSON.optString("userId"));
                         Pref.SetBooleanPref(getActivity().getApplicationContext(), StringUtils.IS_LOGIN, true);
                         if (getActivity() instanceof LoginActivity) {
+                            Pref.SetBooleanPref(getActivity().getApplicationContext(),StringUtils.LOGIN_MAIN,true);
                             LoginActivity loginActivity = (LoginActivity) getActivity();
                             loginActivity.startLoginTagFragment();
 //                            loginActivity.startHome();
@@ -254,6 +257,7 @@ public class LoginWithPhoneFragment extends FragmentController {
             @Override
             public void onErrorMsg(String status_code, String response) {
                 dismissProgressBar();
+                ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
             }
         }, "GET_OTP").makeApiCall(WebServicesUrls.VALIDATE_OTP, jsonObject);
     }

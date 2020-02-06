@@ -10,6 +10,8 @@ import com.google.gson.Gson;
 import com.sundroid.lystn.pojo.UserPOJO;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class UtilityFunction {
 
@@ -53,6 +55,17 @@ public class UtilityFunction {
             file.mkdirs();
         }
         return file.getPath();
+    }
+
+    public static String parseDT(String dt){
+        try{
+            SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date d=simpleDateFormat.parse(dt);
+            return new SimpleDateFormat("dd MMM, YYYY").format(d);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return "";
     }
 
 }

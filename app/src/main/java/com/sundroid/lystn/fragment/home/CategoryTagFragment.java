@@ -130,6 +130,7 @@ public class CategoryTagFragment extends FragmentController {
             @Override
             public void onErrorMsg(String status_code, String response) {
                 dismissProgressBar();
+                ToastClass.showShortToast(getActivity().getApplicationContext(),"Server Down");
             }
         }, "POST_GENRE").makeApiCall(WebServicesUrls.GET_SEE_ALL_BUCKET, jsonObject);
 

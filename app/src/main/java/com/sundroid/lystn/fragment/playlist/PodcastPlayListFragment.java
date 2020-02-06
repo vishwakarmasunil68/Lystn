@@ -1,12 +1,17 @@
 package com.sundroid.lystn.fragment.playlist;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +23,9 @@ import com.sundroid.lystn.fragmentcontroller.FragmentController;
 import com.sundroid.lystn.pojo.artiste.PodcastDetailPOJO;
 import com.sundroid.lystn.pojo.artiste.PodcastEpisodeDetailsPOJO;
 import com.sundroid.lystn.pojo.home.HomeContentPOJO;
+import com.sundroid.lystn.util.TagUtils;
+import com.sundroid.lystn.webservice.DownloadCallback;
+import com.sundroid.lystn.webservice.DownloadSongManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,9 +38,17 @@ public class PodcastPlayListFragment extends FragmentController {
 
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.ll_sorting)
+    LinearLayout ll_sorting;
+    @BindView(R.id.tv_phases)
+    TextView tv_phases;
+    @BindView(R.id.ll_download)
+    LinearLayout ll_download;
 
     List<PodcastEpisodeDetailsPOJO> podcastEpisodeDetailsPOJOS = new ArrayList<>();
     PodcastDetailPOJO podcastDetailPOJO;
+
+    int downloadingPosition = -1;
 
     @Nullable
     @Override
@@ -46,6 +62,81 @@ public class PodcastPlayListFragment extends FragmentController {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         attachGenericAdapter(recyclerView);
+
+        ll_download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+//                if (getActivity() instanceof HomeActivity) {
+//                    DownloadPOJO downloadPOJO=new DownloadPOJO();
+//                    downloadPOJO.setPodcastEpisodeDetailsPOJOS(podcastEpisodeDetailsPOJOS);
+//                    HomeActivity homeActivity = (HomeActivity) getActivity();
+//                    homeActivity.downloadSong(downloadPOJO);
+//                }
+                downloadingPosition = 0;
+                downloadAllSongs();
+            }
+        });
+
+        ll_sorting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popup = new PopupMenu(getActivity(), v);
+                //Inflating the Popup using xml file
+                popup.getMenuInflater().inflate(R.menu.menu_sort_popup, popup.getMenu());
+
+                //registering popup with OnMenuItemClickListener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+//                        Toast.makeText(getActivity().getApplicationContext(), "You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                        switch (item.getItemId()) {
+                            case R.id.popup_az:
+                                Log.d(TagUtils.getTag(), "az clicked");
+                                sortAsc(true);
+                                break;
+                            case R.id.popup_za:
+                                Log.d(TagUtils.getTag(), "za clicked");
+                                sortAsc(false);
+                                break;
+                        }
+                        return true;
+                    }
+                });
+                popup.show();//showing popup menu
+            }
+        });
+    }
+
+    public void downloadAllSongs() {
+        if (getActivity() instanceof HomeActivity) {
+
+            if (podcastEpisodeDetailsPOJOS.size() > 0 && downloadingPosition != -1 && ((podcastEpisodeDetailsPOJOS.size()) > downloadingPosition)) {
+
+                if (!podcastEpisodeDetailsPOJOS.get(downloadingPosition).isDownloaded()) {
+                    HomeActivity homeActivity = (HomeActivity) getActivity();
+                    new DownloadSongManager(getActivity().getApplicationContext(),
+                            homeActivity.getDbManager(),
+                            new DownloadCallback() {
+                                @Override
+                                public void onSuccessDownload(String podcast_id) {
+                                    downloadingPosition++;
+                                    podcastEpisodeAdapter.notifyDataSetChanged();
+                                    downloadAllSongs();
+                                }
+
+                                @Override
+                                public void onDownloadFailed(String error) {
+                                    podcastEpisodeAdapter.notifyDataSetChanged();
+                                }
+                            }).downloadSong(podcastEpisodeDetailsPOJOS.get(downloadingPosition), podcastDetailPOJO);
+                }
+            }
+        }
+    }
+
+    public void setPhases(String size) {
+        tv_phases.setText(size + " Episodes");
     }
 
     public void setPodcastList(PodcastDetailPOJO podcastDetailPOJO, List<PodcastEpisodeDetailsPOJO> podcastEpisodeDetailsPOJOS) {
@@ -80,7 +171,7 @@ public class PodcastPlayListFragment extends FragmentController {
     }
 
     public void sortAsc(boolean is_asc) {
-        List<PodcastEpisodeDetailsPOJO> podcastEpisodeDetailsPOJOS=new ArrayList<>(this.podcastEpisodeDetailsPOJOS);
+        List<PodcastEpisodeDetailsPOJO> podcastEpisodeDetailsPOJOS = new ArrayList<>(this.podcastEpisodeDetailsPOJOS);
         Collections.sort(podcastEpisodeDetailsPOJOS, new Comparator<PodcastEpisodeDetailsPOJO>() {
             public int compare(PodcastEpisodeDetailsPOJO s1, PodcastEpisodeDetailsPOJO s2) {
                 // notice the cast to (Integer) to invoke compareTo
@@ -116,13 +207,16 @@ public class PodcastPlayListFragment extends FragmentController {
 
     }
 
-    public void setCurrentPlayingPosition(){
-        if(getActivity() instanceof HomeActivity){
-            HomeActivity homeActivity= (HomeActivity) getActivity();
+    public void setCurrentPlayingPosition() {
+        if (getActivity() instanceof HomeActivity) {
+            HomeActivity homeActivity = (HomeActivity) getActivity();
             homeActivity.setHomeContentPOJOS(homeContentPOJOS);
         }
     }
 
+    public PodcastDetailPOJO getPodcastDetailPOJO() {
+        return podcastDetailPOJO;
+    }
 
     List<HomeContentPOJO> homeContentPOJOS = new ArrayList<>();
     GenrePlayListAdapter podcastEpisodeAdapter;
@@ -133,7 +227,7 @@ public class PodcastPlayListFragment extends FragmentController {
         recyclerView.setLayoutManager(linearLayoutManager);
         podcastEpisodeAdapter = new GenrePlayListAdapter(getActivity(), this, podcastEpisodeDetailsPOJOS);
         recyclerView.setAdapter(podcastEpisodeAdapter);
-        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setNestedScrollingEnabled(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
